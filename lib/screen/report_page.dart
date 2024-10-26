@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:typed_data';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -37,7 +36,8 @@ class _ReportPageState extends State<ReportPage> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(testReport),
+      // Uri.parse(addReport),
+      Uri.parse('http://192.168.0.9:3000/reports'),
     );
 
     // Menambahkan field teks
@@ -94,6 +94,7 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(),
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
@@ -118,6 +119,9 @@ class _ReportPageState extends State<ReportPage> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                  ),
+                  SizedBox(
+                    height: 35,
                   ),
                   // Judul
                   _buildTextField(

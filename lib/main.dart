@@ -1,4 +1,4 @@
-import 'package:android_fe/screen/report_page.dart';
+import 'package:android_fe/routers.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,10 +14,18 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          primary: Colors.blue,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
+        useMaterial3: false,
       ),
-      home: const ReportPage(),
+      // home: const ReportPage(),
+      home: const RoutersPage(),
     );
   }
 }
