@@ -10,8 +10,24 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
+              begin: FractionalOffset.topLeft,
+              end: FractionalOffset.bottomCenter,
+              stops: [0.0, 0.8],
+              tileMode: TileMode.mirror,
+            ),
+          ),
+          child: Center(),
+        ),
+      ),
     );
   }
 }

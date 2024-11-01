@@ -37,7 +37,7 @@ class _ReportPageState extends State<ReportPage> {
     var request = http.MultipartRequest(
       'POST',
       // Uri.parse(addReport),
-      Uri.parse('http://192.168.0.9:3000/reports'),
+      Uri.parse('http://192.168.181.116:8000/api/reports'),
     );
 
     // Menambahkan field teks
@@ -48,7 +48,7 @@ class _ReportPageState extends State<ReportPage> {
 
     for (var image in _images) {
       request.files.add(await http.MultipartFile.fromPath(
-        'images',
+        'images[]',
         image.path,
       ));
     }
@@ -100,7 +100,8 @@ class _ReportPageState extends State<ReportPage> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [const Color(0XFFF95A3B), Color(0xFFF96713)],
+              // colors: [const Color(0XFFF95A3B), Color(0xFFF96713)],
+              colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
               stops: [0.0, 0.8],
@@ -117,7 +118,7 @@ class _ReportPageState extends State<ReportPage> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   SizedBox(
