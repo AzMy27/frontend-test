@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:android_fe/config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
@@ -37,7 +38,7 @@ class _ReportPageState extends State<ReportPage> {
     var request = http.MultipartRequest(
       'POST',
       // Uri.parse(addReport),
-      Uri.parse('http://192.168.181.116:8000/api/reports'),
+      Uri.parse('http://192.168.0.5:8000/api/reports'),
     );
 
     // Menambahkan field teks
@@ -60,13 +61,20 @@ class _ReportPageState extends State<ReportPage> {
         var responseData = await http.Response.fromStream(response);
         var jsonResponse = json.decode(responseData.body);
         print('Success: $jsonResponse');
+
+        _titleController.clear();
+        _placeController.clear();
+        _dateController.clear();
+        _descriptionController.clear();
+        setState(() {
+          _images.clear();
+          _isNotValidate = false;
+        });
       } else {
         print('Error: ${response.statusCode}');
-        // Tampilkan pesan kesalahan
       }
     } catch (e) {
       print('Exception: $e');
-      // Tampilkan pesan kesalahan
     }
   }
 
@@ -78,10 +86,28 @@ class _ReportPageState extends State<ReportPage> {
     );
 
     if (pickedFile != null) {
-      setState(() {
-        _images.add(File(pickedFile.path));
-      });
+      final newFile = await _compressImage(File(pickedFile.path));
+      if (newFile != null) {
+        setState(() {
+          _images.add(File(pickedFile.path));
+        });
+      }
     }
+  }
+
+  Future<XFile?> _compressImage(File imageFile) async {
+    // Mendapatkan path setelah kompresi
+    final dir = await Directory.systemTemp;
+
+    final targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    // Mengompres gambar
+    var result = await FlutterImageCompress.compressAndGetFile(
+      imageFile.absolute.path,
+      targetPath,
+      quality: 80,
+    );
+    return result;
   }
 
   void _removeImage(File image) {
@@ -94,7 +120,9 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const Text('Laporan'),
+        ),
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,

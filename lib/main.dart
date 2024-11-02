@@ -1,3 +1,4 @@
+import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/routers.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: false,
       ),
       // home: const ReportPage(),
-      home: const RoutersPage(),
+      // home: const RoutersPage(),
+      home: const LoginPage(),
     );
   }
 }
