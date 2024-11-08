@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:android_fe/config/config.dart';
+import 'package:android_fe/config/routing/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -37,8 +37,8 @@ class _ReportPageState extends State<ReportPage> {
 
     var request = http.MultipartRequest(
       'POST',
-      // Uri.parse(addReport),
-      Uri.parse('http://192.168.0.5:8000/api/reports'),
+      Uri.parse(addReport),
+      // Uri.parse('http://192.168.9.116:8000/api/reports'),
     );
 
     // Menambahkan field teks
@@ -128,7 +128,6 @@ class _ReportPageState extends State<ReportPage> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              // colors: [const Color(0XFFF95A3B), Color(0xFFF96713)],
               colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
@@ -136,93 +135,85 @@ class _ReportPageState extends State<ReportPage> {
               tileMode: TileMode.mirror,
             ),
           ),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'Laporan Kegiatan',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                const SizedBox(height: 50), // Tambahkan jarak atas jika diperlukan
+                const Text(
+                  'Laporan Kegiatan',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  // Judul
-                  _buildTextField(
-                    controller: _titleController,
-                    icon: Icons.library_books,
-                    hint: 'Judul Kegiatan',
-                    errorText: _isNotValidate ? "Masukkan Judul" : null,
-                  ),
-                  // Lokasi
-                  _buildTextField(
-                    controller: _placeController,
-                    icon: Icons.location_on,
-                    hint: 'Lokasi',
-                    errorText: _isNotValidate ? "Masukkan Lokasi" : null,
-                  ),
-                  // Tanggal
-                  _buildDateField(),
-                  // Deskripsi
-                  _buildTextField(
-                    controller: _descriptionController,
-                    icon: null,
-                    hint: 'Deskripsi',
-                    maxLines: 5,
-                    errorText: _isNotValidate ? "Masukkan Deskripsi" : null,
-                  ),
-                  // Tombol untuk mengambil gambar
-                  ElevatedButton.icon(
-                    onPressed: _pickImage,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text("Ambil Gambar"),
-                  ),
-                  // Menampilkan semua gambar yang diambil
-                  if (_images.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Wrap(
-                      // Menggunakan Wrap untuk menampilkan gambar dalam grid
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      children: List.generate(_images.length, (index) {
-                        return Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Container(
-                              height: 150,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: FileImage(_images[index]),
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
+                ),
+                // Buat jarak yang konsisten
+                SizedBox(height: 35),
+                // Konten lainnya
+                _buildTextField(
+                  controller: _titleController,
+                  icon: Icons.library_books,
+                  hint: 'Judul Kegiatan',
+                  errorText: _isNotValidate ? "Masukkan Judul" : null,
+                ),
+                _buildTextField(
+                  controller: _placeController,
+                  icon: Icons.location_on,
+                  hint: 'Lokasi',
+                  errorText: _isNotValidate ? "Masukkan Lokasi" : null,
+                ),
+                _buildDateField(),
+                _buildTextField(
+                  controller: _descriptionController,
+                  icon: null,
+                  hint: 'Deskripsi',
+                  maxLines: 5,
+                  errorText: _isNotValidate ? "Masukkan Deskripsi" : null,
+                ),
+                ElevatedButton.icon(
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.camera_alt),
+                  label: const Text("Ambil Gambar"),
+                ),
+                if (_images.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: List.generate(_images.length, (index) {
+                      return Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Container(
+                            height: 150,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: FileImage(_images[index]),
+                                fit: BoxFit.cover,
                               ),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.cancel, color: Colors.red),
-                              onPressed: () {
-                                _removeImage(_images[index]);
-                              },
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _submitButton,
-                    child: const Text("Kirim"),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.cancel, color: Colors.red),
+                            onPressed: () {
+                              _removeImage(_images[index]);
+                            },
+                          ),
+                        ],
+                      );
+                    }),
                   ),
-                  const SizedBox(height: 20),
                 ],
-              ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitButton,
+                  child: const Text("Kirim"),
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
         ),

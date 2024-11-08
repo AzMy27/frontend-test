@@ -1,5 +1,4 @@
 import 'package:android_fe/auth/app_logo.dart';
-import 'package:android_fe/auth/regist_page.dart';
 import 'package:android_fe/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -76,13 +75,6 @@ class _LoginPageState extends State<LoginPage> {
                           VxBox(child: "Login".text.white.makeCentered().p16()).green600.roundedLg.make().px16().py16(),
                     ),
                   ]),
-                  GestureDetector(
-                    onTap: () => {
-                      print('Register'),
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => RegistPage())),
-                    },
-                    child: HStack(["Create Account?".text.make(), " Register".text.white.make()]).centered(),
-                  ),
                 ],
               ),
             ),
