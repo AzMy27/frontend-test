@@ -22,6 +22,10 @@ class _BiodataPageState extends State<BiodataPage> {
 
   List<File> _fotoDai = [];
   bool _isNotValidate = false;
+
+  void _simpanSubmit() async {
+    //
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +40,17 @@ class _BiodataPageState extends State<BiodataPage> {
       ),
       body: SingleChildScrollView(
         child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
+              begin: FractionalOffset.topLeft,
+              end: FractionalOffset.bottomCenter,
+              stops: [0.0, 0.8],
+              tileMode: TileMode.mirror,
+            ),
+          ),
           padding: const EdgeInsets.all(15.0),
           child: Column(
             children: [
@@ -60,7 +75,7 @@ class _BiodataPageState extends State<BiodataPage> {
                         color: Colors.yellow,
                       ),
                       child: const Icon(
-                        Icons.camera_alt_outlined, // Properti icon seharusnya di sini
+                        Icons.camera_alt_outlined,
                         color: Colors.black,
                         size: 20,
                       ),
@@ -68,24 +83,17 @@ class _BiodataPageState extends State<BiodataPage> {
                   ),
                 ],
               ),
+              const Text(
+                'NIK Pengguna',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               const SizedBox(height: 40),
               // Anda dapat menambahkan elemen lain di bawah sini\
               Form(
                 child: Column(
                   children: [
-                    _buildTextField(
-                      controller: _nikController,
-                      icon: Icons.credit_card_off,
-                      hint: 'NIK',
-                      errorText: _isNotValidate ? "Masukkan NIK" : null,
-                      readOnly: true,
-                    ),
-                    _buildTextField(
-                      controller: _namaController,
-                      icon: Icons.person,
-                      hint: 'Nama',
-                      errorText: _isNotValidate ? "Masukkan Nama" : null,
-                    ),
                     _buildTextField(
                       controller: _namaController,
                       icon: Icons.person,
@@ -94,26 +102,26 @@ class _BiodataPageState extends State<BiodataPage> {
                     ),
                     _buildTextField(
                       controller: _noHpController,
-                      icon: Icons.person,
+                      icon: Icons.phone,
                       hint: 'No Hp',
                       errorText: _isNotValidate ? "Masukkan No. Hp" : null,
                     ),
                     _buildTextField(
                       controller: _tempatLahirController,
-                      icon: Icons.person,
+                      icon: Icons.location_city_rounded,
                       hint: 'Tempat Lahir',
                       errorText: _isNotValidate ? "Masukkan Tempat Lahir" : null,
                     ),
                     _buildDateField(),
                     _buildTextField(
                       controller: _alamatController,
-                      icon: Icons.person,
+                      icon: Icons.location_on,
                       hint: 'Alamat',
                       errorText: _isNotValidate ? "Masukkan Alamat" : null,
                     ),
                     _buildTextField(
                       controller: _pendidikanAkhirController,
-                      icon: Icons.person,
+                      icon: Icons.school,
                       hint: 'Pendidikan Akhir',
                       errorText: _isNotValidate ? "Masukkan Pendidikan Akhir" : null,
                     ),
@@ -122,6 +130,21 @@ class _BiodataPageState extends State<BiodataPage> {
                       icon: Icons.person,
                       hint: 'Status Kawin',
                       errorText: _isNotValidate ? "Masukkan Status Kawin" : null,
+                    ),
+                    ElevatedButton(
+                      onPressed: _simpanSubmit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        side: BorderSide.none,
+                        shape: const StadiumBorder(),
+                      ),
+                      child: const Text(
+                        "Simpan",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -139,7 +162,6 @@ class _BiodataPageState extends State<BiodataPage> {
     String? errorText,
     IconData? icon,
     int? maxLines,
-    bool readOnly = false,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),

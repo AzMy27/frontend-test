@@ -96,16 +96,14 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Future<XFile?> _compressImage(File imageFile) async {
-    // Mendapatkan path setelah kompresi
     final dir = await Directory.systemTemp;
 
     final targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 
-    // Mengompres gambar
     var result = await FlutterImageCompress.compressAndGetFile(
       imageFile.absolute.path,
       targetPath,
-      quality: 80,
+      quality: 60,
     );
     return result;
   }
@@ -211,6 +209,10 @@ class _ReportPageState extends State<ReportPage> {
                 ElevatedButton(
                   onPressed: _submitButton,
                   child: const Text("Kirim"),
+                  style: ElevatedButton.styleFrom(
+                    side: BorderSide.none,
+                    shape: const StadiumBorder(),
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],

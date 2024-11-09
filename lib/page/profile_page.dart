@@ -25,6 +25,17 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
+              begin: FractionalOffset.topLeft,
+              end: FractionalOffset.bottomCenter,
+              stops: [0.0, 0.8],
+              tileMode: TileMode.mirror,
+            ),
+          ),
           padding: const EdgeInsets.all(15.0),
           child: Column(
             children: [
@@ -103,6 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
               ),
               const SizedBox(height: 20),
+              Divider(),
               ProfileMenuWidget(
                 title: 'Logout',
                 icon: Icons.logout,
