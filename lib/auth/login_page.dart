@@ -1,5 +1,5 @@
 import 'package:android_fe/auth/app_logo.dart';
-import 'package:android_fe/config/routing/config.dart';
+import 'package:android_fe/config/routing/routes.dart';
 import 'package:android_fe/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
