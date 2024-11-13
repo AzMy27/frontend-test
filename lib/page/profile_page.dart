@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:android_fe/auth/login_page.dart';
+import 'package:android_fe/config/routing/routes.dart';
 import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/biodata.dart';
+import 'package:android_fe/profil/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,6 +17,36 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  Future<void> _logoutSubmit() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
+      // API request to the logout endpoint
+      final response = await http.post(
+        Uri.parse(logoutSubmit),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        await prefs.remove('auth_token');
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
+        );
+      } else {
+        final responseData = json.decode(response.body);
+        print('Logout failed: ${responseData['message']}');
+      }
+    } catch (e) {
+      print('Error during logout: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +130,14 @@ class _ProfilePageState extends State<ProfilePage> {
               ProfileMenuWidget(
                 title: 'Settings',
                 icon: Icons.settings,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SettingPage(),
+                    ),
+                  );
+                },
               ),
               ProfileMenuWidget(
                 title: 'Account',
@@ -118,9 +161,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ProfileMenuWidget(
                 title: 'Logout',
                 icon: Icons.logout,
-                textColor: Colors.red, // Set the text color
+                textColor: Colors.red,
                 onPressed: () {
-                  // Add your logout logic here
+                  _logoutSubmit();
                 },
               ),
             ],
