@@ -1,5 +1,5 @@
 import 'package:android_fe/page/history_page.dart';
-import 'package:android_fe/screen/report_page.dart';
+import 'package:android_fe/report/report_page.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 

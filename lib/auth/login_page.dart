@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
-  void _loginButton() async {
+  Future<void> _loginButton() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
         _isNotValidate = true;
