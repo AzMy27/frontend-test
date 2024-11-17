@@ -1,5 +1,5 @@
 import 'package:android_fe/auth/app_logo.dart';
-import 'package:android_fe/config/routing/routes.dart';
+import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse(loginSubmit),
+        Uri.parse(ApiConstants.loginSubmit),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _emailController.text,
