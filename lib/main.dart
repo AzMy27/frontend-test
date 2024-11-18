@@ -1,23 +1,40 @@
 import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/report/report_provider.dart';
+import 'package:android_fe/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  initializeDateFormatting('id_ID', null).then((_) => runApp(MyApp(token: token)));
+  // runApp(MyApp(token: token));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? token;
+  const MyApp({super.key, this.token});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ReportProvider()),
-        // Tambahkan provider lain jika diperlukan
       ],
       child: MaterialApp(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          Locale('id', 'ID'),
+        ],
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -31,7 +48,9 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: false,
         ),
-        home: const LoginPage(),
+        // home: const LoginPage(),
+        // home: token == null ? const LoginPage() : const RoutersPage(),
+        home: token != null ? const RoutersPage() : const LoginPage(),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:android_fe/config/routing/routes.dart';
+import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/report/report_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -68,32 +68,31 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Future<void> _submitReport() async {
-    if (!_formKey.currentState!.validate()) {
-      context.read<ReportProvider>().setValidationError(true);
-      return;
-    }
-
-    final success = await context.read<ReportProvider>().submitReport(
-          title: _titleController.text,
-          place: _placeController.text,
-          date: _dateController.text,
-          description: _descriptionController.text,
+    if (_formKey.currentState!.validate()) {
+      if (context.read<ReportProvider>().images.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Mohon tambahkan minimal satu gambar')),
         );
+        return;
+      }
 
-    if (success) {
-      _clearForm();
-      if (mounted) {
+      final success = await context.read<ReportProvider>().submitReport(
+            title: _titleController.text,
+            place: _placeController.text,
+            date: _dateController.text,
+            description: _descriptionController.text,
+            images: context.read<ReportProvider>().images,
+          );
+
+      if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Laporan berhasil dikirim')),
         );
-      }
-    } else {
-      if (mounted) {
+        _clearForm();
+        Navigator.pop(context); // Kembali ke halaman sebelumnya
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.read<ReportProvider>().errorMessage ?? 'Gagal mengirim laporan'),
-            backgroundColor: Colors.red,
-          ),
+          const SnackBar(content: Text('Gagal mengirim laporan')),
         );
       }
     }
@@ -120,7 +119,7 @@ class _ReportPageState extends State<ReportPage> {
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFFFFFFF), Color(0xFFD3D3D3)],
+              colors: [Color(0xFFFFFFFF), Color(0xFFfbfcff)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
               stops: [0.0, 0.8],

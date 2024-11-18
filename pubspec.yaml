@@ -43,6 +43,9 @@ dependencies:
   shared_preferences: ^2.3.3
   provider: ^6.1.2
   permission_handler: ^11.3.1
+  intl: ^0.19.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -68,7 +71,13 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/polbeng.png
+    - images/logo_default.png
+    - images/surabaya.png
+    - images/bengkalis.png
+    - images/Riau.png
     - images/gambar.png
+    - images/bengkalis-bermasa.png
+    - json/info.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

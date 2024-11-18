@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:android_fe/auth/login_page.dart';
-import 'package:android_fe/config/routing/routes.dart';
+import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/biodata.dart';
 import 'package:android_fe/profil/settings.dart';
@@ -19,31 +19,46 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Future<void> _logoutSubmit() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('auth_token');
+      // Get the stored token from SharedPreferences
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
 
-      // API request to the logout endpoint
+      if (token == null) {
+        throw Exception('No token found');
+      }
+
+      // Make logout request to API
       final response = await http.post(
-        Uri.parse(logoutSubmit),
+        Uri.parse(ApiConstants.logoutSubmit),
         headers: {
           'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
       );
 
       if (response.statusCode == 200) {
-        await prefs.remove('auth_token');
+        // Clear the stored token
+        await prefs.remove('token');
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-          (route) => false,
+        // Navigate to login page and clear navigation stack
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (Route<dynamic> route) => false,
         );
       } else {
-        final responseData = json.decode(response.body);
-        print('Logout failed: ${responseData['message']}');
+        // Handle error response
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        throw Exception(responseData['message'] ?? 'Logout failed');
       }
     } catch (e) {
-      print('Error during logout: $e');
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error during logout: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -65,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
+              colors: [const Color(0xFFFFFFFF), const Color(0xFFfbfcff)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
               stops: [0.0, 0.8],
@@ -216,7 +231,7 @@ class ProfileMenuWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(100),
         ),
         child: const Icon(
-          Icons.arrow_right,
+          Icons.arrow_forward_ios,
           size: 28.0,
           color: Colors.grey,
         ),

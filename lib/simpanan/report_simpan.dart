@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:android_fe/config/routing/routes.dart';
+import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -37,7 +37,7 @@ class _ReportPageState extends State<ReportPage> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(addReport),
+      Uri.parse(ApiConstants.addReport),
       // Uri.parse('http://192.168.9.116:8000/api/reports'),
     );
 

@@ -1,25 +1,21 @@
-import 'package:android_fe/config/routing/routes.dart';
-import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:android_fe/config/routing/ApiRoutes.dart';
 
 class ReportProvider extends ChangeNotifier {
-  bool _isLoading = false;
-  bool _isNotValidate = false;
   List<File> _images = [];
-  String? _errorMessage;
+  bool _isLoading = false;
+  bool _hasValidationError = false;
 
-  bool get isLoading => _isLoading;
-  bool get isNotValidate => _isNotValidate;
   List<File> get images => _images;
-  String? get errorMessage => _errorMessage;
+  bool get isLoading => _isLoading;
+  bool get hasValidationError => _hasValidationError;
 
   void addImage(File image) {
-    if (_images.length < AppConfig.maxImages) {
-      _images.add(image);
-      notifyListeners();
-    }
+    _images.add(image);
+    notifyListeners();
   }
 
   void removeImage(File image) {
@@ -27,8 +23,13 @@ class ReportProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearImages() {
+    _images.clear();
+    notifyListeners();
+  }
+
   void setValidationError(bool value) {
-    _isNotValidate = value;
+    _hasValidationError = value;
     notifyListeners();
   }
 
@@ -37,62 +38,51 @@ class ReportProvider extends ChangeNotifier {
     required String place,
     required String date,
     required String description,
+    required List<File> images,
   }) async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      _isLoading = true;
-      _errorMessage = null;
-      notifyListeners();
-
-      if (!await _checkInternetConnection()) {
-        throw Exception('No internet connection');
-      }
-
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(addReport),
+        Uri.parse(ApiConstants.addReport),
       );
 
+      // Add text fields
       request.fields['title'] = title;
       request.fields['place'] = place;
       request.fields['date'] = date;
       request.fields['description'] = description;
 
-      for (var image in _images) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'images[]',
-          image.path,
-        ));
+      // Add images
+      for (var i = 0; i < images.length; i++) {
+        var pic = await http.MultipartFile.fromPath(
+          'images[]', // Make sure this matches your backend expectation
+          images[i].path,
+        );
+        request.files.add(pic);
       }
 
       var response = await request.send();
-      var responseData = await http.Response.fromStream(response);
+      var responseData = await response.stream.toBytes();
+      var responseString = String.fromCharCodes(responseData);
+      var jsonData = json.decode(responseString);
 
       if (response.statusCode == 201) {
-        clearImages();
+        _isLoading = false;
+        notifyListeners();
         return true;
       } else {
-        var jsonResponse = json.decode(responseData.body);
-        throw Exception(jsonResponse['message'] ?? 'Failed to submit report');
+        print('Error: ${jsonData['message']}');
+        _isLoading = false;
+        notifyListeners();
+        return false;
       }
     } catch (e) {
-      _errorMessage = e.toString();
-      return false;
-    } finally {
+      print('Exception: $e');
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  void clearImages() {
-    _images.clear();
-    notifyListeners();
-  }
-
-  Future<bool> _checkInternetConnection() async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    } on SocketException catch (_) {
       return false;
     }
   }

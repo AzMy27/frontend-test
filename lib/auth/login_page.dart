@@ -21,6 +21,22 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _loginButton() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
@@ -36,57 +52,46 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse(ApiConstants.loginSubmit),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse(ApiConstants.loginSubmit), // Sesuaikan dengan URL API Anda
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: jsonEncode({
           'email': _emailController.text,
           'password': _passwordController.text,
         }),
       );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+      final responseData = jsonDecode(response.body);
 
-        // Verify that 'token' exists in the response
-        if (data.containsKey('token')) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', data['token']);
+      if (response.statusCode == 200 && responseData['status'] == 'success') {
+        // Simpan token
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', responseData['token']);
 
-          setState(() {
-            _isLoading = false;
-          });
-
+        if (mounted) {
+          // Navigate ke halaman utama
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => RoutersPage()),
+            MaterialPageRoute(builder: (context) => const RoutersPage()),
           );
-        } else {
-          throw Exception('Token not found in response');
         }
       } else {
+        if (mounted) {
+          _showErrorDialog(responseData['message'] ?? 'Login failed');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorDialog('Network error occurred. Please try again.');
+      }
+    } finally {
+      if (mounted) {
         setState(() {
           _isLoading = false;
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login gagal. Periksa email dan password Anda.'),
-            backgroundColor: Colors.red,
-          ),
-        );
       }
-    } catch (e) {
-      print("Error: $e");
-      setState(() {
-        _isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Terjadi kesalahan. Silakan coba lagi.'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
