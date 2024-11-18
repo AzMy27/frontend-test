@@ -1,6 +1,5 @@
 import 'package:android_fe/page/Profile_page.dart';
 import 'package:android_fe/page/design_page.dart';
-import 'package:android_fe/page/home_page.dart';
 import 'package:flutter/material.dart';
 
 class RoutersPage extends StatefulWidget {
