@@ -1,6 +1,6 @@
 import 'package:android_fe/auth/app_logo.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
-import 'package:android_fe/routers.dart';
+import 'package:android_fe/page/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -69,6 +69,7 @@ class _LoginPageState extends State<LoginPage> {
         // Simpan token
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', responseData['token']);
+        await prefs.setString('username', responseData['user']['name']);
 
         if (mounted) {
           // Navigate ke halaman utama

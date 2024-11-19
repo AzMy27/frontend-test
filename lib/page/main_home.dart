@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:android_fe/config/constants/colors.dart' as color;
-import 'package:android_fe/page/history_page.dart';
+import 'package:android_fe/report/history_page.dart';
 import 'package:android_fe/report/report_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({super.key});
@@ -21,14 +23,50 @@ class _MainHomeState extends State<MainHome> {
     });
   }
 
+  String _currentDate = '';
+  String _currentTime = '';
+  Timer? _timer;
+  String _username = '';
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initData();
+    _startClock();
+    _loadUserName();
   }
 
-  var date = DateTime.now();
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? 'Pengguna'; // Default ke 'Pengguna' jika null
+    });
+  }
+
+  void _startClock() {
+    _updateDateTime(); // Initial update
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        _updateDateTime();
+      });
+    });
+  }
+
+  void _updateDateTime() {
+    final now = DateTime.now();
+    _currentDate = '${now.day}-${now.month}-${now.year}';
+    _currentTime = '${_formatDigit(now.hour)}:${_formatDigit(now.minute)}:${_formatDigit(now.second)}';
+  }
+
+  String _formatDigit(int value) {
+    return value < 10 ? '0$value' : value.toString();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +79,7 @@ class _MainHomeState extends State<MainHome> {
             Row(
               children: [
                 Text(
-                  'Home Page',
+                  'Beranda',
                   style: TextStyle(
                     fontSize: 30,
                     color: color.AppColor.homePageTitle,
@@ -60,7 +98,7 @@ class _MainHomeState extends State<MainHome> {
             Row(
               children: [
                 Text(
-                  'Selamat Datang Pengguna',
+                  'Selamat Datang $_username',
                   style: TextStyle(
                     fontSize: 20,
                     color: color.AppColor.homePageSubtitle,
@@ -107,7 +145,7 @@ class _MainHomeState extends State<MainHome> {
                       height: 10,
                     ),
                     Text(
-                      '${date.day.toString()}-${date.month.toString()}-${date.year.toString()}',
+                      _currentDate,
                       style: TextStyle(
                         fontSize: 24,
                         color: color.AppColor.homePageContainerTextSmall,
@@ -125,7 +163,7 @@ class _MainHomeState extends State<MainHome> {
                       height: 10,
                     ),
                     Text(
-                      '${date.hour.toString()}:${date.minute.toString()}:${date.second.toString()}',
+                      _currentTime,
                       style: TextStyle(
                         fontSize: 24,
                         color: color.AppColor.homePageContainerTextSmall,
