@@ -70,6 +70,7 @@ class _LoginPageState extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', responseData['token']);
         await prefs.setString('username', responseData['user']['name']);
+        await prefs.setString('email', responseData['user']['email']);
 
         if (mounted) {
           // Navigate ke halaman utama

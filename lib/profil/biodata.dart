@@ -1,7 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:android_fe/auth/login_page.dart';
+import 'package:android_fe/config/routing/ApiRoutes.dart';
+import 'package:android_fe/model/dai_model.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 class BiodataPage extends StatefulWidget {
   const BiodataPage({super.key});
@@ -20,12 +27,39 @@ class _BiodataPageState extends State<BiodataPage> {
   final TextEditingController _pendidikanAkhirController = TextEditingController();
   final TextEditingController _statusKawinController = TextEditingController();
 
-  List<File> _fotoDai = [];
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
   bool _isNotValidate = false;
 
-  void _simpanSubmit() async {
-    //
+  Future<void> _pickImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1800,
+        maxHeight: 1800,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      // Handle any errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
   }
+
+  Future<void> _ShowDai(int id) async {
+    // Code show dai here...
+  }
+
+  Future<void> _simpanSubmit() async {
+    //Code update here...
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +70,7 @@ class _BiodataPageState extends State<BiodataPage> {
             fontSize: 20,
           ),
         ),
-        centerTitle: true, // Untuk menempatkan title di tengah
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -61,36 +95,44 @@ class _BiodataPageState extends State<BiodataPage> {
                     height: 120,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: Image.asset('images/polbeng.png'),
+                      child: _selectedImage != null
+                          ? Image.file(
+                              _selectedImage!,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset('images/polbeng.png'),
                     ),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.yellow,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt_outlined,
-                        color: Colors.black,
-                        size: 20,
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.yellow,
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt_outlined,
+                          color: Colors.black,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
+              // Rest of your existing code...
               const Text(
-                'NIK Pengguna',
+                'NIK DAI',
                 style: TextStyle(
                   fontSize: 16,
                 ),
               ),
               const SizedBox(height: 40),
-              // Anda dapat menambahkan elemen lain di bawah sini\
               Form(
                 child: Column(
                   children: [

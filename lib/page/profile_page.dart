@@ -17,6 +17,23 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String _username = '';
+  String _email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? 'Pengguna';
+      _email = prefs.getString('email') ?? 'Email tidak ditemukan';
+    });
+  }
+
   Future<void> _logoutSubmit() async {
     try {
       // Get the stored token from SharedPreferences
@@ -99,16 +116,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Nama Pengguna',
-                style: TextStyle(
+              Text(
+                _username, // Tampilkan nama pengguna
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Text(
-                'Email Pengguna',
-                style: TextStyle(
+              Text(
+                _email, // Tampilkan email pengguna
+                style: const TextStyle(
                   fontSize: 16,
                 ),
               ),
