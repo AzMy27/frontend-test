@@ -1,17 +1,66 @@
 import 'dart:io';
+import 'package:android_fe/model/report_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:android_fe/model/report_model.dart';
 
 class ReportProvider extends ChangeNotifier {
   List<File> _images = [];
   bool _isLoading = false;
   bool _hasValidationError = false;
+  String? _token;
+  String? _errorMessage;
+  List<Reports> _reports = [];
+  List<Reports> get reports => _reports;
 
   List<File> get images => _images;
   bool get isLoading => _isLoading;
   bool get hasValidationError => _hasValidationError;
+  String? get errorMessage => _errorMessage;
+
+  ReportProvider() {
+    _myToken();
+  }
+
+  Future<void> getAllReport() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        print('Token not found');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(ApiConstants.getReport),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseJson = json.decode(response.body);
+        final List<dynamic> data = responseJson['data']; // Adjusted here
+        _reports = data.map((json) => Reports.fromJson(json)).toList();
+        notifyListeners();
+      } else {
+        print('Failed to load reports: ${response.body}');
+      }
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
+
+  Future<void> _myToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token');
+    notifyListeners();
+  }
 
   void addImage(File image) {
     _images.add(image);
@@ -28,8 +77,9 @@ class ReportProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setValidationError(bool value) {
+  void setValidationError(bool value, [String? message]) {
     _hasValidationError = value;
+    _errorMessage = message;
     notifyListeners();
   }
 
@@ -40,7 +90,18 @@ class ReportProvider extends ChangeNotifier {
     required String description,
     required List<File> images,
   }) async {
+    if (_token == null) {
+      setValidationError(true, 'Authentication token not found');
+      return false;
+    }
+
+    if (images.isEmpty) {
+      setValidationError(true, 'Please add at least one image');
+      return false;
+    }
+
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -49,41 +110,52 @@ class ReportProvider extends ChangeNotifier {
         Uri.parse(ApiConstants.addReport),
       );
 
-      // Add text fields
-      request.fields['title'] = title;
-      request.fields['place'] = place;
-      request.fields['date'] = date;
-      request.fields['description'] = description;
+      request.headers.addAll({
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $_token',
+      });
 
-      // Add images
+      request.fields.addAll({
+        'title': title,
+        'place': place,
+        'date': date,
+        'description': description,
+      });
+
       for (var i = 0; i < images.length; i++) {
-        var pic = await http.MultipartFile.fromPath(
-          'images[]', // Make sure this matches your backend expectation
-          images[i].path,
-        );
-        request.files.add(pic);
+        try {
+          final file = await http.MultipartFile.fromPath(
+            'images[]',
+            images[i].path,
+            filename: 'image_$i.jpg',
+          );
+          request.files.add(file);
+        } catch (e) {
+          throw Exception('Failed to process image ${i + 1}: ${e.toString()}');
+        }
       }
 
-      var response = await request.send();
-      var responseData = await response.stream.toBytes();
-      var responseString = String.fromCharCodes(responseData);
-      var jsonData = json.decode(responseString);
+      // Send request
+      final streamedResponse = await request.send().timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Request timed out'),
+          );
+
+      final response = await http.Response.fromStream(streamedResponse);
+      final responseData = json.decode(response.body);
 
       if (response.statusCode == 201) {
-        _isLoading = false;
-        notifyListeners();
+        clearImages();
         return true;
       } else {
-        print('Error: ${jsonData['message']}');
-        _isLoading = false;
-        notifyListeners();
-        return false;
+        throw Exception(responseData['message'] ?? 'Unknown error occurred');
       }
     } catch (e) {
-      print('Exception: $e');
+      setValidationError(true, e.toString());
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 }

@@ -1,14 +1,12 @@
-// final url = 'http://192.168.0.13:8000/api/';
-// final url = 'http://192.168.131.116:8000/api/';
-// final addReport = url + 'reportsAPI';
-// final loginSubmit = url + 'loginAPI';
-// final logoutSubmit = url + 'logoutAPI';
-
 class ApiConstants {
-  static const String baseUrl = 'http://10.0.0.2:8000';
+  // static const String baseUrl = 'http://192.168.131.116:8000';
+  // static const String baseUrl = 'http://10.0.2.2:8000';
+  static const String baseUrl = 'http://192.168.0.13:8000';
   static const String loginSubmit = '$baseUrl/api/loginAPI';
-  static const String addReport = '$baseUrl/api/reportsAPI';
   static const String logoutSubmit = '$baseUrl/api/logoutAPI';
+  static const String addReport = '$baseUrl/api/reportPost';
+  static const String getReport = '$baseUrl/api/reportGet';
+  static const String getDai = '$baseUrl/api/daiAPI';
 }
 
 class AppConfig {

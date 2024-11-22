@@ -1,6 +1,6 @@
 import 'package:android_fe/auth/app_logo.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
-import 'package:android_fe/page/navbar.dart';
+import 'package:android_fe/page/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -15,22 +15,54 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isNotValidate = false;
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // Email validation
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  }
+
+  // Password validation
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
   void _showErrorDialog(String message) {
+    if (!mounted) return;
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('Error'),
+        title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -38,63 +70,64 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _loginButton() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      setState(() {
-        _isNotValidate = true;
-      });
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _isNotValidate = false;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      final response = await http.post(
-        Uri.parse(ApiConstants.loginSubmit), // Sesuaikan dengan URL API Anda
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }),
-      );
+      final response = await http
+          .post(
+            Uri.parse(ApiConstants.loginSubmit),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({
+              'email': _emailController.text.trim(),
+              'password': _passwordController.text,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () => throw Exception('Connection timeout'),
+          );
 
       final responseData = jsonDecode(response.body);
 
-      if (response.statusCode == 200 && responseData['status'] == 'success') {
-        // Simpan token
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', responseData['token']);
-        await prefs.setString('username', responseData['user']['name']);
-        await prefs.setString('email', responseData['user']['email']);
+      if (!mounted) return;
 
-        if (mounted) {
-          // Navigate ke halaman utama
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const RoutersPage()),
-          );
-        }
+      if (response.statusCode == 200 && responseData['status'] == 'success') {
+        await _saveUserData(responseData);
+        _navigateToHome();
       } else {
-        if (mounted) {
-          _showErrorDialog(responseData['message'] ?? 'Login failed');
-        }
+        _showErrorDialog(responseData['message'] ?? 'Login failed');
       }
     } catch (e) {
-      if (mounted) {
-        _showErrorDialog('Network error occurred. Please try again.');
-      }
+      _showErrorDialog(
+        e.toString().contains('timeout')
+            ? 'Connection timeout. Please check your internet connection.'
+            : 'Network error occurred. Please try again.',
+      );
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _saveUserData(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await Future.wait([
+      prefs.setString('token', data['token']),
+      prefs.setString('username', data['user']['name']),
+      prefs.setString('email', data['user']['email']),
+      prefs.setString('image', data['user']['image']),
+    ]);
+  }
+
+  void _navigateToHome() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const RoutersPage()),
+    );
   }
 
   @override
@@ -104,12 +137,9 @@ class _LoginPageState extends State<LoginPage> {
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                const Color(0XFFF95A3B),
-                const Color(0XFFF96713),
-              ],
+              colors: [Color(0XFFF95A3B), Color(0XFFF96713)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
               stops: [0.0, 0.8],
@@ -118,74 +148,99 @@ class _LoginPageState extends State<LoginPage> {
           ),
           child: Center(
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CommonLogo(),
-                  HeightBox(10.0),
-                  "Email Sign in".text.size(22).yellow100.make(),
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Email",
-                      prefixIcon: Icon(Icons.email), // Tambah icon email
-                      errorStyle: TextStyle(color: Colors.white),
-                      errorText: _isNotValidate ? "Masukkan Email" : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      ),
-                    ),
-                  ).p4().px24(),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible, // Toggle visibility berdasarkan state
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Password",
-                      prefixIcon: Icon(Icons.lock), // Tambah icon lock
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                      errorStyle: TextStyle(color: Colors.white),
-                      errorText: _isNotValidate ? "Masukkan Password" : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      ),
-                    ),
-                  ).p4().px24(),
-                  HStack([
-                    GestureDetector(
-                      onTap: _isLoading ? null : _loginButton,
-                      child: VxBox(
-                        child: _isLoading
-                            ? SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : "Login".text.white.makeCentered().p16(),
-                      ).green600.roundedLg.make().px16().py16(),
-                    ),
-                  ]),
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CommonLogo(),
+                    const HeightBox(10.0),
+                    "Email Sign in".text.size(22).yellow100.make(),
+                    _buildEmailField(),
+                    _buildPasswordField(),
+                    _buildLoginButton(),
+                  ],
+                ),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmailField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: TextFormField(
+        controller: _emailController,
+        keyboardType: TextInputType.emailAddress,
+        enabled: !_isLoading,
+        validator: _validateEmail,
+        decoration: const InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          hintText: "Email",
+          prefixIcon: Icon(Icons.email),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: TextFormField(
+        controller: _passwordController,
+        obscureText: !_isPasswordVisible,
+        enabled: !_isLoading,
+        validator: _validatePassword,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          hintText: "Password",
+          prefixIcon: const Icon(Icons.lock),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+              color: Colors.grey,
+            ),
+            onPressed: _isLoading ? null : () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+          ),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return GestureDetector(
+      onTap: _isLoading ? null : _loginButton,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.green[600],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : const Text(
+                'Login',
+                style: TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
       ),
     );
   }

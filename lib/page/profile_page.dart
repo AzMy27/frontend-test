@@ -19,6 +19,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String _username = '';
   String _email = '';
+  String _profilImageURL = '';
 
   @override
   void initState() {
@@ -31,20 +32,26 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _username = prefs.getString('username') ?? 'Pengguna';
       _email = prefs.getString('email') ?? 'Email tidak ditemukan';
+      _profilImageURL = prefs.getString('image') ?? '';
+      if (_profilImageURL.isNotEmpty) {
+        _profilImageURL = 'http://your-laravel-domain.com/storage/' + _profilImageURL;
+      }
     });
   }
 
   Future<void> _logoutSubmit() async {
     try {
-      // Get the stored token from SharedPreferences
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('token');
 
       if (token == null) {
-        throw Exception('No token found');
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (Route<dynamic> route) => false,
+        );
+        return;
       }
 
-      // Make logout request to API
       final response = await http.post(
         Uri.parse(ApiConstants.logoutSubmit),
         headers: {
@@ -55,21 +62,17 @@ class _ProfilePageState extends State<ProfilePage> {
       );
 
       if (response.statusCode == 200) {
-        // Clear the stored token
         await prefs.remove('token');
 
-        // Navigate to login page and clear navigation stack
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginPage()),
           (Route<dynamic> route) => false,
         );
       } else {
-        // Handle error response
         final Map<String, dynamic> responseData = json.decode(response.body);
         throw Exception(responseData['message'] ?? 'Logout failed');
       }
     } catch (e) {
-      // Show error message to user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error during logout: ${e.toString()}'),
@@ -110,10 +113,47 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 width: 120,
                 height: 120,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: Image.asset('images/polbeng.png'),
-                ),
+                child: _profilImageURL.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.network(
+                          _profilImageURL,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback to default image if network image fails to load
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: Image.asset(
+                                'images/polbeng.png',
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.asset(
+                          'images/polbeng.png',
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
               ),
               const SizedBox(height: 10),
               Text(
