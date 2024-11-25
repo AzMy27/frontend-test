@@ -31,10 +31,10 @@ class Reports {
       date: json['date'],
       description: json['description'],
       validasiDesa: json['validasi_desa'],
-      koreksiDesa: json['koreksi_desa'],
+      koreksiDesa: json['koreksi_desa'] ?? '',
       validasiKecamatan: json['validasi_kecamatan'],
-      koreksiKecamatan: json['koreksi_kecamatan'],
-      images: List<String>.from(json['images']),
+      koreksiKecamatan: json['koreksi_kecamatan'] ?? '',
+      images: (json['images'] as List<dynamic>?)?.map((image) => image.toString()).toList() ?? [],
     );
   }
 }
