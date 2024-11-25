@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:android_fe/profil/biodata.dart';
 import 'package:flutter/material.dart';
 import 'package:android_fe/config/constants/colors.dart' as color;
 import 'package:android_fe/report/history_page.dart';

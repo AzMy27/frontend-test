@@ -1,5 +1,5 @@
 class Reports {
-  final int id;
+  final int? id;
   final String title;
   final String place;
   final String date;
@@ -25,14 +25,14 @@ class Reports {
 
   factory Reports.fromJson(Map<String, dynamic> json) {
     return Reports(
-      id: json['id'],
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '0'),
       title: json['title'],
       place: json['place'],
       date: json['date'],
       description: json['description'],
-      validasiDesa: json['validasi_desa'],
+      validasiDesa: json['validasi_desa'] ?? '',
       koreksiDesa: json['koreksi_desa'] ?? '',
-      validasiKecamatan: json['validasi_kecamatan'],
+      validasiKecamatan: json['validasi_kecamatan'] ?? '',
       koreksiKecamatan: json['koreksi_kecamatan'] ?? '',
       images: (json['images'] as List<dynamic>?)?.map((image) => image.toString()).toList() ?? [],
     );

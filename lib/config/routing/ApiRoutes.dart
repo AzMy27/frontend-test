@@ -6,7 +6,7 @@ class ApiConstants {
   static const String logoutSubmit = '$baseUrl/api/logoutAPI';
   static const String addReport = '$baseUrl/api/reportPost';
   static const String getReport = '$baseUrl/api/reportGet';
-  static const String showReportId = '$baseUrl/api/reportShow/{report}';
+  static const String showReportId = '$baseUrl/api/reportShow';
   static const String getDai = '$baseUrl/api/daiAPI';
 }
 

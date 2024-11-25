@@ -1,5 +1,6 @@
 import 'package:android_fe/model/report_model.dart';
 import 'package:android_fe/report/get_report.dart';
+import 'package:android_fe/report/show_report.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -84,8 +85,27 @@ class _HistoryPageState extends State<HistoryPage> {
                               Text('Tanggal: ${report.date}'),
                             ],
                           ),
-                          onTap: () {
+                          onTap: () async {
                             // Navigasi ke detail laporan
+                            if (_token == null || report.id == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('ID laporan tidak valid')),
+                              );
+                              return;
+                            }
+                            try {
+                              final reportDetail = await get_reports.fetchReportsById(_token!, report.id!);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailReportPage(report: reportDetail),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Gagal memuat detail laporan: $e')),
+                              );
+                            }
                           },
                         ),
                       );
