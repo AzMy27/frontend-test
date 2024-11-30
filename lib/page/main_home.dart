@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:android_fe/profil/biodata.dart';
 import 'package:flutter/material.dart';
 import 'package:android_fe/config/constants/colors.dart' as color;
 import 'package:android_fe/report/history_page.dart';
@@ -88,11 +87,19 @@ class _MainHomeState extends State<MainHome> {
                   ),
                 ),
                 Expanded(child: Container()),
-                Icon(
-                  Icons.person,
-                  size: 20,
-                  color: color.AppColor.homePageIcons,
-                )
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => const BiodataPage()),
+                //     );
+                //   },
+                //   child: Icon(
+                //     Icons.person,
+                //     size: 20,
+                //     color: color.AppColor.homePageIcons,
+                //   ),
+                // ),
               ],
             ),
             SizedBox(height: 30),
@@ -230,7 +237,7 @@ class _MainHomeState extends State<MainHome> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Status Laporan',
+                          'Laporan Hari Ini',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

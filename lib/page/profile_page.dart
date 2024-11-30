@@ -4,6 +4,7 @@ import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/biodata.dart';
+import 'package:android_fe/profil/reset_password.dart';
 import 'package:android_fe/profil/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _email = prefs.getString('email') ?? 'Email tidak ditemukan';
       _profilImageURL = prefs.getString('image') ?? '';
       if (_profilImageURL.isNotEmpty) {
-        _profilImageURL = 'http://your-laravel-domain.com/storage/' + _profilImageURL;
+        _profilImageURL = '' + _profilImageURL;
       }
     });
   }
@@ -205,16 +206,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => SettingPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => SettingPage()),
                   );
                 },
               ),
               ProfileMenuWidget(
                 title: 'Account',
                 icon: Icons.account_circle,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ResetPassword()),
+                  );
+                },
               ),
               ProfileMenuWidget(
                 title: 'Help',
@@ -222,9 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => AboutPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => AboutPage()),
                   );
                 },
               ),

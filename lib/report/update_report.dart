@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
+import 'package:android_fe/model/report_model.dart';
 import 'package:android_fe/report/crud/report_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,20 +10,35 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart'; // Import Geolocator
 
-class ReportPage extends StatefulWidget {
-  const ReportPage({super.key});
+class UpdateReport extends StatefulWidget {
+  final Reports? report;
+
+  const UpdateReport({super.key, this.report});
 
   @override
-  State<ReportPage> createState() => _ReportPageState();
+  State<UpdateReport> createState() => _UpdateReportState();
 }
 
-class _ReportPageState extends State<ReportPage> {
+class _UpdateReportState extends State<UpdateReport> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _coordinateController = TextEditingController(); // Controller untuk koordinat
+
+  @override
+  void initState() {
+    super.initState();
+    // Populate the fields with the existing report data
+    if (widget.report != null) {
+      _titleController.text = widget.report!.title;
+      _placeController.text = widget.report!.place;
+      _dateController.text = widget.report!.date;
+      _descriptionController.text = widget.report!.description;
+      _coordinateController.text = widget.report!.coordinatePoint ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -41,22 +57,6 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    await _checkAndRequestCameraPermission();
-
-    final ImagePicker picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.camera,
-    );
-
-    if (pickedFile != null) {
-      final newFile = await _compressImage(File(pickedFile.path));
-      if (newFile != null) {
-        context.read<ReportProvider>().addImage(File(newFile.path));
-      }
-    }
-  }
-
   Future<XFile?> _compressImage(File imageFile) async {
     final dir = await Directory.systemTemp;
     final targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
@@ -70,46 +70,33 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  Future<void> _submitReport() async {
+  Future<void> _updateReport() async {
     if (_formKey.currentState!.validate()) {
-      if (context.read<ReportProvider>().images.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mohon tambahkan minimal satu gambar')),
-        );
-        return;
-      }
+      // Get the current provider
+      final provider = context.read<ReportProvider>();
 
-      final success = await context.read<ReportProvider>().submitReport(
-            title: _titleController.text,
-            place: _placeController.text,
-            date: _dateController.text,
-            description: _descriptionController.text,
-            images: context.read<ReportProvider>().images,
-            coordinatePoint: _coordinateController.text,
-          );
+      // Call the API to update the report
+      final success = await provider.updateReport(
+        reportId: widget.report!.id!,
+        title: _titleController.text,
+        place: _placeController.text,
+        date: _dateController.text,
+        description: _descriptionController.text,
+        images: provider.images,
+        coordinatePoint: _coordinateController.text,
+      );
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Laporan berhasil dikirim')),
+          const SnackBar(content: Text('Laporan berhasil diperbarui')),
         );
-        _clearForm();
-        Navigator.pop(context); // Kembali ke halaman sebelumnya
+        Navigator.pop(context); // Go back to the previous screen
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal mengirim laporan')),
+          SnackBar(content: Text('Gagal memperbarui laporan: ${provider.errorMessage}')),
         );
       }
     }
-  }
-
-  void _clearForm() {
-    _titleController.clear();
-    _placeController.clear();
-    _dateController.clear();
-    _descriptionController.clear();
-    _coordinateController.clear(); // Clear koordinat
-    context.read<ReportProvider>().clearImages();
-    context.read<ReportProvider>().setValidationError(false);
   }
 
   Future<void> _getCurrentLocation() async {
@@ -147,7 +134,7 @@ class _ReportPageState extends State<ReportPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Laporan'),
+          title: const Text('Update Laporan'),
         ),
         body: Container(
           width: MediaQuery.of(context).size.width,
@@ -169,7 +156,7 @@ class _ReportPageState extends State<ReportPage> {
                 children: <Widget>[
                   const SizedBox(height: 50),
                   const Text(
-                    'Laporan Kegiatan',
+                    'Update Laporan Kegiatan',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -223,17 +210,7 @@ class _ReportPageState extends State<ReportPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _getCurrentLocation, // Mendapatkan lokasi saat tombol ditekan
-                    child: const Text('Dapatkan Koordinat'),
-                  ),
                   SizedBox(height: 25),
-                  ElevatedButton.icon(
-                    onPressed: _pickImage,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text("Ambil Gambar"),
-                  ),
                   Consumer<ReportProvider>(
                     builder: (context, provider, child) {
                       return Column(
@@ -258,10 +235,6 @@ class _ReportPageState extends State<ReportPage> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
-                                    IconButton(
-                                      icon: const Icon(Icons.cancel, color: Colors.red),
-                                      onPressed: () => provider.removeImage(image),
-                                    ),
                                   ],
                                 );
                               }).toList(),
@@ -271,7 +244,7 @@ class _ReportPageState extends State<ReportPage> {
                           provider.isLoading
                               ? const CircularProgressIndicator()
                               : ElevatedButton(
-                                  onPressed: _submitReport,
+                                  onPressed: _updateReport,
                                   style: ElevatedButton.styleFrom(
                                     side: BorderSide.none,
                                     shape: const StadiumBorder(),

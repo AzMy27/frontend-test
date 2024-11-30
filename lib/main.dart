@@ -1,5 +1,5 @@
 import 'package:android_fe/auth/login_page.dart';
-import 'package:android_fe/report/report_provider.dart';
+import 'package:android_fe/report/crud/report_provider.dart';
 import 'package:android_fe/page/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

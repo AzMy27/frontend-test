@@ -1,13 +1,13 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'dart:io';
-import 'package:android_fe/auth/login_page.dart';
-import 'package:android_fe/config/routing/ApiRoutes.dart';
-import 'package:android_fe/model/dai_model.dart';
+// import 'package:android_fe/auth/login_page.dart';
+// import 'package:android_fe/config/routing/ApiRoutes.dart';
+// import 'package:android_fe/model/dai_model.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class BiodataPage extends StatefulWidget {
@@ -29,7 +29,7 @@ class _BiodataPageState extends State<BiodataPage> {
 
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
-  bool _isNotValidate = false;
+  final bool _isNotValidate = false;
 
   Future<void> _pickImage() async {
     try {
@@ -76,9 +76,9 @@ class _BiodataPageState extends State<BiodataPage> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [const Color(0xFFFFFFFF), const Color(0xFFD3D3D3)],
+              colors: [Color(0xFFFFFFFF), Color(0xFFD3D3D3)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
               stops: [0.0, 0.8],
@@ -217,7 +217,7 @@ class _BiodataPageState extends State<BiodataPage> {
           errorStyle: const TextStyle(color: Colors.red),
           errorText: errorText,
           hintText: hint,
-          border: OutlineInputBorder(
+          border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
         ),
@@ -238,7 +238,7 @@ class _BiodataPageState extends State<BiodataPage> {
           errorStyle: const TextStyle(color: Colors.red),
           errorText: _isNotValidate ? "Pilih tanggal" : null,
           hintText: "Pilih tanggal",
-          border: OutlineInputBorder(
+          border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
         ),

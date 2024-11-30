@@ -4,6 +4,7 @@ class Reports {
   final String place;
   final String date;
   final String description;
+  final String? coordinatePoint;
   final String validasiDesa;
   final String koreksiDesa;
   final String validasiKecamatan;
@@ -16,6 +17,7 @@ class Reports {
     required this.place,
     required this.date,
     required this.description,
+    required this.coordinatePoint,
     required this.validasiDesa,
     required this.koreksiDesa,
     required this.validasiKecamatan,
@@ -30,6 +32,7 @@ class Reports {
       place: json['place'],
       date: json['date'],
       description: json['description'],
+      coordinatePoint: json['coordinate_point'] ?? '',
       validasiDesa: json['validasi_desa'] ?? '',
       koreksiDesa: json['koreksi_desa'] ?? '',
       validasiKecamatan: json['validasi_kecamatan'] ?? '',

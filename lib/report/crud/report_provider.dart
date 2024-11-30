@@ -5,10 +5,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:android_fe/model/report_model.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ReportProvider extends ChangeNotifier {
   List<File> _images = [];
+  // List<Map<String, dynamic>> _images = []; // Menyimpan file dan URL
   bool _isLoading = false;
   bool _hasValidationError = false;
   String? _token;
@@ -17,6 +18,7 @@ class ReportProvider extends ChangeNotifier {
   List<Reports> get reports => _reports;
 
   List<File> get images => _images;
+  // List<Map<String, dynamic>> get images => _images;
   bool get isLoading => _isLoading;
   bool get hasValidationError => _hasValidationError;
   String? get errorMessage => _errorMessage;
@@ -45,7 +47,7 @@ class ReportProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final responseJson = json.decode(response.body);
-        final List<dynamic> data = responseJson['data']; // Adjusted here
+        final List<dynamic> data = responseJson['data'];
         _reports = data.map((json) => Reports.fromJson(json)).toList();
         notifyListeners();
       } else {
@@ -89,6 +91,7 @@ class ReportProvider extends ChangeNotifier {
     required String date,
     required String description,
     required List<File> images,
+    required String coordinatePoint, // Tambahkan parameter untuk koordinat
   }) async {
     if (_token == null) {
       setValidationError(true, 'Authentication token not found');
@@ -120,6 +123,7 @@ class ReportProvider extends ChangeNotifier {
         'place': place,
         'date': date,
         'description': description,
+        'coordinate_point': coordinatePoint, // Sertakan koordinat di sini
       });
 
       for (var i = 0; i < images.length; i++) {
@@ -145,6 +149,80 @@ class ReportProvider extends ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 201) {
+        clearImages();
+        return true;
+      } else {
+        throw Exception(responseData['message'] ?? 'Unknown error occurred');
+      }
+    } catch (e) {
+      setValidationError(true, e.toString());
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<File> downloadImage(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    final directory = await getTemporaryDirectory();
+    final file = File('${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
+  }
+
+  Future<bool> updateReport({
+    required int reportId,
+    required String title,
+    required String place,
+    required String date,
+    required String description,
+    required List<File> images,
+    required String coordinatePoint,
+  }) async {
+    if (_token == null) {
+      setValidationError(true, 'Authentication token not found');
+      return false;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${ApiConstants.updateReport}/$reportId'),
+      );
+
+      request.headers.addAll({
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $_token',
+      });
+
+      request.fields.addAll({
+        'title': title,
+        'place': place,
+        'date': date,
+        'description': description,
+        'coordinate_point': coordinatePoint,
+      });
+
+      // Add images if provided
+      for (var i = 0; i < images.length; i++) {
+        final file = await http.MultipartFile.fromPath(
+          'images[]',
+          images[i].path,
+          filename: 'image_$i.jpg',
+        );
+        request.files.add(file);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
         clearImages();
         return true;
       } else {
