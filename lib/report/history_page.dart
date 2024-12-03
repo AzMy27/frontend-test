@@ -1,5 +1,5 @@
 import 'package:android_fe/model/report_model.dart';
-import 'package:android_fe/report/crud/get_report.dart';
+import 'package:android_fe/report/crud/get_all_report.dart';
 import 'package:android_fe/report/show_report.dart';
 import 'package:android_fe/report/update_report.dart';
 import 'package:flutter/material.dart';

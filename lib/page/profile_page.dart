@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
-import 'package:android_fe/profil/biodata.dart';
+import 'package:android_fe/profil/edit_biodata.dart';
 import 'package:android_fe/profil/reset_password.dart';
 import 'package:android_fe/profil/settings.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _username = prefs.getString('username') ?? 'Pengguna';
       _email = prefs.getString('email') ?? 'Email tidak ditemukan';
       _profilImageURL = prefs.getString('image') ?? '';
+      print('Profil Image URL: $_profilImageURL');
       if (_profilImageURL.isNotEmpty) {
         _profilImageURL = '' + _profilImageURL;
       }

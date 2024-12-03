@@ -1,4 +1,5 @@
 class Dai {
+  final int? id;
   final String nik;
   final String nama;
   final String noHp;
@@ -9,6 +10,7 @@ class Dai {
   final String statusKawin;
 
   Dai({
+    required this.id,
     required this.nik,
     required this.nama,
     required this.noHp,
@@ -20,6 +22,7 @@ class Dai {
   });
   factory Dai.fromJson(Map<String, dynamic> json) {
     return Dai(
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '0'),
       nik: json['nik'] ?? '',
       nama: json['nama'] ?? '',
       noHp: json['no_hp'] ?? '',

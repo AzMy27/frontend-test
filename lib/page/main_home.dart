@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:android_fe/model/report_model.dart';
+import 'package:android_fe/report/crud/get_all_report.dart';
 import 'package:flutter/material.dart';
 import 'package:android_fe/config/constants/colors.dart' as color;
 import 'package:android_fe/report/history_page.dart';
@@ -27,6 +29,8 @@ class _MainHomeState extends State<MainHome> {
   String _currentTime = '';
   Timer? _timer;
   String _username = '';
+  Reports? _latestReport;
+  final getReports _getReports = getReports();
 
   @override
   void initState() {
@@ -36,15 +40,35 @@ class _MainHomeState extends State<MainHome> {
     _loadUserName();
   }
 
+  Future<void> _fetchLatestReport() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token != null) {
+      try {
+        final reports = await _getReports.fetchReports(token);
+        if (reports.isNotEmpty) {
+          setState(() {
+            // Sort reports by date and get the most recent one
+            _latestReport = reports.reduce(
+                (current, next) => DateTime.parse(current.date).isAfter(DateTime.parse(next.date)) ? current : next);
+          });
+        }
+      } catch (e) {
+        print('Error fetching latest report: $e');
+      }
+    }
+  }
+
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _username = prefs.getString('username') ?? 'Pengguna'; // Default ke 'Pengguna' jika null
+      _username = prefs.getString('username') ?? 'Pengguna';
     });
   }
 
   void _startClock() {
-    _updateDateTime(); // Initial update
+    _updateDateTime();
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       setState(() {
         _updateDateTime();
@@ -87,19 +111,6 @@ class _MainHomeState extends State<MainHome> {
                   ),
                 ),
                 Expanded(child: Container()),
-                // InkWell(
-                //   onTap: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => const BiodataPage()),
-                //     );
-                //   },
-                //   child: Icon(
-                //     Icons.person,
-                //     size: 20,
-                //     color: color.AppColor.homePageIcons,
-                //   ),
-                // ),
               ],
             ),
             SizedBox(height: 30),
@@ -182,7 +193,6 @@ class _MainHomeState extends State<MainHome> {
               ),
             ),
             SizedBox(height: 15),
-            // Status Laporan
             Container(
               height: 180,
               width: MediaQuery.of(context).size.width,
@@ -194,10 +204,6 @@ class _MainHomeState extends State<MainHome> {
                     height: 120,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      // image: DecorationImage(
-                      //   image: AssetImage('images/bengkalis-bermasa.png'),
-                      //   fit: BoxFit.fill,
-                      // ),
                       boxShadow: [
                         BoxShadow(
                           blurRadius: 40,
@@ -217,7 +223,6 @@ class _MainHomeState extends State<MainHome> {
                     width: MediaQuery.of(context).size.width,
                     margin: const EdgeInsets.only(right: 240, bottom: 30),
                     decoration: BoxDecoration(
-                      // color: Colors.redAccent.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(15),
                       image: DecorationImage(
                         image: AssetImage('images/polbeng.png'),
@@ -228,7 +233,6 @@ class _MainHomeState extends State<MainHome> {
                   Container(
                     width: double.maxFinite,
                     height: 100,
-                    // color: Colors.redAccent.withOpacity(0.2),
                     margin: const EdgeInsets.only(
                       left: 170,
                       top: 30,
@@ -247,13 +251,19 @@ class _MainHomeState extends State<MainHome> {
                         SizedBox(height: 10),
                         RichText(
                           text: TextSpan(
-                            text: 'Laporan sedang diperiksa\n\n',
+                            text: 'Status: ',
                             style: TextStyle(
                               fontSize: 16,
                               color: color.AppColor.homePagePlanColor,
                             ),
                             children: [
-                              TextSpan(text: 'status: '),
+                              TextSpan(
+                                text: _getStatusText(),
+                                style: TextStyle(
+                                  color: _getStatusColor(),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -267,7 +277,6 @@ class _MainHomeState extends State<MainHome> {
               children: [
                 Text(
                   'Laporkan Kegiatan',
-                  // textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w500,
@@ -283,7 +292,6 @@ class _MainHomeState extends State<MainHome> {
                   removeTop: true,
                   context: context,
                   child: ListView.builder(
-                    // itemCount: info.length,
                     itemCount: (info.length.toDouble() / 2).toInt(),
                     itemBuilder: (_, index) {
                       int buttonA = 2 * index;
@@ -391,5 +399,37 @@ class _MainHomeState extends State<MainHome> {
         ),
       ),
     );
+  }
+
+  String _getStatusText() {
+    if (_latestReport == null) {
+      return 'Tidak ada laporan';
+    }
+
+    if (_latestReport!.validasiDesa == 'ditolak' || _latestReport!.validasiKecamatan == 'ditolak') {
+      return 'Ditolak';
+    } else if (_latestReport!.validasiDesa == 'diterima' && _latestReport!.validasiKecamatan == 'diterima') {
+      return 'Diterima';
+    } else if (_latestReport!.validasiDesa == 'diterima' && _latestReport!.validasiKecamatan == null) {
+      return 'Diterima (Menunggu Validasi Kecamatan)';
+    } else {
+      return 'Sedang Diproses';
+    }
+  }
+
+  Color _getStatusColor() {
+    if (_latestReport == null) {
+      return Color(0xFF123456);
+    }
+
+    if (_latestReport!.validasiDesa == 'ditolak' || _latestReport!.validasiKecamatan == 'ditolak') {
+      return Colors.red;
+    } else if (_latestReport!.validasiDesa == 'diterima' && _latestReport!.validasiKecamatan == 'diterima') {
+      return Colors.green;
+    } else if (_latestReport!.validasiDesa == 'diterima' && _latestReport!.validasiKecamatan == null) {
+      return Colors.orange;
+    } else {
+      return Colors.yellow;
+    }
   }
 }

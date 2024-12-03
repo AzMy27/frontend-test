@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ReportProvider extends ChangeNotifier {
   List<File> _images = [];
@@ -91,7 +90,7 @@ class ReportProvider extends ChangeNotifier {
     required String date,
     required String description,
     required List<File> images,
-    required String coordinatePoint, // Tambahkan parameter untuk koordinat
+    required String coordinatePoint,
   }) async {
     if (_token == null) {
       setValidationError(true, 'Authentication token not found');
@@ -161,14 +160,6 @@ class ReportProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  Future<File> downloadImage(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
   }
 
   Future<bool> updateReport({
