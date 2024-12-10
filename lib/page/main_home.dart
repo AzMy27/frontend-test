@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:android_fe/model/report_model.dart';
-import 'package:android_fe/report/crud/get_all_report.dart';
+import 'package:android_fe/report/crud/get_report.dart';
 import 'package:flutter/material.dart';
 import 'package:android_fe/config/constants/colors.dart' as color;
 import 'package:android_fe/report/history_page.dart';
@@ -96,26 +96,27 @@ class _MainHomeState extends State<MainHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: color.AppColor.homePageBackground,
-      body: Container(
-        padding: const EdgeInsets.only(top: 70, left: 30, right: 30),
-        child: Column(
-          children: <Widget>[
-            Row(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Beranda',
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: color.AppColor.homePageTitle,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Beranda',
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: color.AppColor.homePageTitle,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Spacer(),
+                  ],
                 ),
-                Expanded(child: Container()),
-              ],
-            ),
-            SizedBox(height: 30),
-            Row(
-              children: [
+                SizedBox(height: 20),
                 Text(
                   'Selamat Datang $_username',
                   style: TextStyle(
@@ -124,157 +125,141 @@ class _MainHomeState extends State<MainHome> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 250,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    color.AppColor.gradientFirst.withOpacity(0.8),
-                    color.AppColor.gradientSecond.withOpacity(0.9),
-                  ],
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(5, 10),
-                    blurRadius: 20,
-                    color: color.AppColor.gradientSecond.withOpacity(0.2),
-                  ),
-                ],
-              ),
-              child: Container(
-                padding: const EdgeInsets.only(left: 20, top: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hari/Tanggal',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: color.AppColor.homePageContainerTextSmall,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      _currentDate,
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: color.AppColor.homePageContainerTextSmall,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Waktu',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: color.AppColor.homePageContainerTextSmall,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      _currentTime,
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: color.AppColor.homePageContainerTextSmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            Container(
-              height: 180,
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    margin: const EdgeInsets.only(top: 30),
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 40,
-                          offset: Offset(8, 10),
-                          color: color.AppColor.gradientSecond.withOpacity(0.3),
-                        ),
-                        BoxShadow(
-                          blurRadius: 10,
-                          offset: Offset(-1, -5),
-                          color: color.AppColor.gradientSecond.withOpacity(0.3),
-                        ),
+                SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        color.AppColor.gradientFirst.withOpacity(0.8),
+                        color.AppColor.gradientSecond.withOpacity(0.9),
                       ],
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: Offset(5, 10),
+                        blurRadius: 20,
+                        color: color.AppColor.gradientSecond.withOpacity(0.2),
+                      ),
+                    ],
                   ),
-                  Container(
-                    height: 200,
-                    width: MediaQuery.of(context).size.width,
-                    margin: const EdgeInsets.only(right: 240, bottom: 30),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      image: DecorationImage(
-                        image: AssetImage('images/polbeng.png'),
-                        fit: BoxFit.fill,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hari/Tanggal',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: color.AppColor.homePageContainerTextSmall,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        _currentDate,
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: color.AppColor.homePageContainerTextSmall,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Waktu',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: color.AppColor.homePageContainerTextSmall,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        _currentTime,
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: color.AppColor.homePageContainerTextSmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 15),
+                Stack(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 30),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 40,
+                            offset: Offset(8, 10),
+                            color: color.AppColor.gradientSecond.withOpacity(0.3),
+                          ),
+                          BoxShadow(
+                            blurRadius: 10,
+                            offset: Offset(-1, -5),
+                            color: color.AppColor.gradientSecond.withOpacity(0.3),
+                          ),
+                        ],
+                      ),
+                      height: 120,
+                    ),
+                    Positioned(
+                      left: 10,
+                      top: 0,
+                      child: Container(
+                        height: 150,
+                        width: 150,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          image: const DecorationImage(
+                            image: AssetImage('images/book.png'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    width: double.maxFinite,
-                    height: 100,
-                    margin: const EdgeInsets.only(
+                    Positioned(
                       left: 170,
                       top: 30,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Laporan Hari Ini',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: color.AppColor.homePageTitle,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        RichText(
-                          text: TextSpan(
-                            text: 'Status: ',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Laporan Hari Ini',
                             style: TextStyle(
-                              fontSize: 16,
-                              color: color.AppColor.homePagePlanColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: color.AppColor.homePageTitle,
                             ),
-                            children: [
-                              TextSpan(
-                                text: _getStatusText(),
-                                style: TextStyle(
-                                  color: _getStatusColor(),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          RichText(
+                            text: TextSpan(
+                              text: 'Status: ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: color.AppColor.homePagePlanColor,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: _getStatusText(),
+                                  style: TextStyle(
+                                    color: _getStatusColor(),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              children: [
+                  ],
+                ),
+                SizedBox(height: 20),
                 Text(
                   'Laporkan Kegiatan',
                   style: TextStyle(
@@ -283,116 +268,80 @@ class _MainHomeState extends State<MainHome> {
                     color: color.AppColor.homePageTitle,
                   ),
                 ),
+                SizedBox(height: 10),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: (info.length.toDouble() / 2).toInt(),
+                  itemBuilder: (_, index) {
+                    int buttonA = 2 * index;
+                    int buttonB = 2 * index + 1;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildInfoCard(info[buttonA]),
+                        _buildInfoCard(info[buttonB]),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
-            Expanded(
-              child: OverflowBox(
-                maxWidth: MediaQuery.of(context).size.width,
-                child: MediaQuery.removePadding(
-                  removeTop: true,
-                  context: context,
-                  child: ListView.builder(
-                    itemCount: (info.length.toDouble() / 2).toInt(),
-                    itemBuilder: (_, index) {
-                      int buttonA = 2 * index;
-                      int buttonB = 2 * index + 1;
-                      return Row(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ReportPage()),
-                              );
-                            },
-                            child: Container(
-                              width: (MediaQuery.of(context).size.width - 90) / 2,
-                              height: 170,
-                              margin: EdgeInsets.only(left: 30, bottom: 15, top: 15),
-                              padding: EdgeInsets.only(bottom: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                image: DecorationImage(
-                                  image: AssetImage(info[buttonA]['img']),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 3,
-                                    offset: Offset(5, 5),
-                                    color: color.AppColor.gradientSecond.withOpacity(0.2),
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 3,
-                                    offset: Offset(-5, -5),
-                                    color: color.AppColor.gradientSecond.withOpacity(0.2),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(
-                                    info[buttonA]['title'],
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: color.AppColor.homePageDetail,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const HistoryPage()),
-                              );
-                            },
-                            child: Container(
-                              width: (MediaQuery.of(context).size.width - 90) / 2,
-                              height: 170,
-                              margin: EdgeInsets.only(left: 30, bottom: 15, top: 15),
-                              padding: EdgeInsets.only(bottom: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                image: DecorationImage(
-                                  image: AssetImage(info[buttonB]['img']),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 3,
-                                    offset: Offset(5, 5),
-                                    color: color.AppColor.gradientSecond.withOpacity(0.2),
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 3,
-                                    offset: Offset(-5, -5),
-                                    color: color.AppColor.gradientSecond.withOpacity(0.2),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(
-                                    info[buttonB]['title'],
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: color.AppColor.homePageDetail,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(Map<String, dynamic> data) {
+    return InkWell(
+      onTap: () {
+        if (data['title'] == 'Buat Laporan') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ReportPage()),
+          );
+        } else if (data['title'] == 'Riwayat Laporan') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HistoryPage()),
+          );
+        }
+      },
+      child: Container(
+        width: (MediaQuery.of(context).size.width - 90) / 2,
+        height: 150,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 3,
+              offset: Offset(5, 5),
+              color: color.AppColor.gradientSecond.withOpacity(0.2),
+            ),
+            BoxShadow(
+              blurRadius: 3,
+              offset: Offset(-5, -5),
+              color: color.AppColor.gradientSecond.withOpacity(0.2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              data['img'],
+              height: 100,
+            ),
+            SizedBox(height: 5),
+            Text(
+              data['title'],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: color.AppColor.homePageDetail,
               ),
             ),
           ],
@@ -403,7 +352,7 @@ class _MainHomeState extends State<MainHome> {
 
   String _getStatusText() {
     if (_latestReport == null) {
-      return 'Tidak ada laporan';
+      return 'Tidak ada';
     }
 
     if (_latestReport!.validasiDesa == 'ditolak' || _latestReport!.validasiKecamatan == 'ditolak') {

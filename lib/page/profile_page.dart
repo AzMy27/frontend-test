@@ -4,7 +4,6 @@ import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/edit_biodata.dart';
-import 'package:android_fe/profil/reset_password.dart';
 import 'package:android_fe/profil/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,27 +17,13 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _username = '';
-  String _email = '';
-  String _profilImageURL = '';
+  String _username = 'Pengguna';
+  String _email = 'Email tidak ditemukan';
+  String _profilImage = 'images/polbeng.png';
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
-  }
-
-  Future<void> _loadUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _username = prefs.getString('username') ?? 'Pengguna';
-      _email = prefs.getString('email') ?? 'Email tidak ditemukan';
-      _profilImageURL = prefs.getString('image') ?? '';
-      print('Profil Image URL: $_profilImageURL');
-      if (_profilImageURL.isNotEmpty) {
-        _profilImageURL = '' + _profilImageURL;
-      }
-    });
   }
 
   Future<void> _logoutSubmit() async {
@@ -94,7 +79,6 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 20,
           ),
         ),
-        // centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -115,47 +99,15 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 width: 120,
                 height: 120,
-                child: _profilImageURL.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.network(
-                          _profilImageURL,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            // Fallback to default image if network image fails to load
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: Image.asset(
-                                'images/polbeng.png',
-                                width: 120,
-                                height: 120,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.asset(
-                          'images/polbeng.png',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Image.asset(
+                    _profilImage,
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               const SizedBox(height: 10),
               Text(
@@ -212,16 +164,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
               ),
               ProfileMenuWidget(
-                title: 'Account',
-                icon: Icons.account_circle,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ResetPassword()),
-                  );
-                },
-              ),
-              ProfileMenuWidget(
                 title: 'Help',
                 icon: Icons.help,
                 onPressed: () {
@@ -230,6 +172,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     MaterialPageRoute(builder: (context) => AboutPage()),
                   );
                 },
+              ),
+              ProfileMenuWidget(
+                title: 'Akan Datang',
+                icon: Icons.next_plan_outlined,
+                onPressed: () {},
               ),
               const SizedBox(height: 20),
               Divider(),

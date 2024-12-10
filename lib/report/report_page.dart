@@ -7,7 +7,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
-import 'package:geolocator/geolocator.dart'; // Import Geolocator
+import 'package:geolocator/geolocator.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -19,18 +19,24 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _coordinateController = TextEditingController(); // Controller untuk koordinat
+  final TextEditingController _coordinateController = TextEditingController();
+  final TextEditingController _targetController = TextEditingController();
+  final TextEditingController _purposeController = TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
+    _typeController.dispose();
     _placeController.dispose();
     _dateController.dispose();
     _descriptionController.dispose();
-    _coordinateController.dispose(); // Dispose koordinat controller
+    _coordinateController.dispose();
+    _targetController.dispose();
+    _purposeController.dispose();
     super.dispose();
   }
 
@@ -81,11 +87,14 @@ class _ReportPageState extends State<ReportPage> {
 
       final success = await context.read<ReportProvider>().submitReport(
             title: _titleController.text,
+            type: _typeController.text,
             place: _placeController.text,
             date: _dateController.text,
             description: _descriptionController.text,
             images: context.read<ReportProvider>().images,
             coordinatePoint: _coordinateController.text,
+            target: _targetController.text,
+            purpose: _purposeController.text,
           );
 
       if (success) {
@@ -93,10 +102,10 @@ class _ReportPageState extends State<ReportPage> {
           const SnackBar(content: Text('Laporan berhasil dikirim')),
         );
         _clearForm();
-        Navigator.pop(context); // Kembali ke halaman sebelumnya
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal mengirim laporan')),
+          SnackBar(content: Text('Gagal mengirim laporan: ${context.read<ReportProvider>().errorMessage}')),
         );
       }
     }
@@ -104,10 +113,13 @@ class _ReportPageState extends State<ReportPage> {
 
   void _clearForm() {
     _titleController.clear();
+    _typeController.clear();
     _placeController.clear();
     _dateController.clear();
+    _targetController.clear();
+    _targetController.clear();
     _descriptionController.clear();
-    _coordinateController.clear(); // Clear koordinat
+    _coordinateController.clear();
     context.read<ReportProvider>().clearImages();
     context.read<ReportProvider>().setValidationError(false);
   }
@@ -134,7 +146,7 @@ class _ReportPageState extends State<ReportPage> {
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      _coordinateController.text = '${position.latitude}, ${position.longitude}'; // Set koordinat ke text field
+      _coordinateController.text = '${position.latitude}, ${position.longitude}';
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal mendapatkan lokasi: $e')),
@@ -189,6 +201,17 @@ class _ReportPageState extends State<ReportPage> {
                     },
                   ),
                   _buildTextField(
+                    controller: _typeController,
+                    icon: Icons.type_specimen,
+                    hint: 'Tipe Kegiatan',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tipe tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  _buildTextField(
                     controller: _placeController,
                     icon: Icons.location_on,
                     hint: 'Lokasi',
@@ -200,16 +223,40 @@ class _ReportPageState extends State<ReportPage> {
                     },
                   ),
                   _buildTextField(
-                    controller: _coordinateController, // Controller untuk koordinat
-                    icon: Icons.map, // Ikon untuk koordinat
+                    controller: _targetController,
+                    icon: Icons.people_alt_outlined,
+                    hint: 'Target',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Target tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  _buildTextField(
+                    controller: _purposeController,
+                    hint: 'Tujuan',
+                    icon: Icons.rocket_launch_outlined,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tujuan tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  _buildTextField(
+                    controller: _coordinateController,
+                    icon: Icons.map,
                     hint: 'Titik Koordinat',
-                    readOnly: true, // Membuat field ini hanya bisa dibaca
+                    readOnly: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Titik koordinat tidak boleh kosong';
                       }
                       return null;
                     },
+                    buttonText: 'Cari',
+                    onButtonPressed: _getCurrentLocation,
                   ),
                   _buildDateField(),
                   _buildTextField(
@@ -222,11 +269,6 @@ class _ReportPageState extends State<ReportPage> {
                       }
                       return null;
                     },
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _getCurrentLocation, // Mendapatkan lokasi saat tombol ditekan
-                    child: const Text('Dapatkan Koordinat'),
                   ),
                   SizedBox(height: 25),
                   ElevatedButton.icon(
@@ -298,25 +340,48 @@ class _ReportPageState extends State<ReportPage> {
     IconData? icon,
     int? maxLines,
     String? Function(String?)? validator,
-    bool readOnly = false, // Tambahkan parameter readOnly
+    bool readOnly = false,
+    TextCapitalization textCapitalization = TextCapitalization.sentences,
+    VoidCallback? onButtonPressed,
+    String? buttonText,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          prefixIcon: icon != null ? Icon(icon) : null,
-          filled: true,
-          fillColor: Colors.white,
-          hintText: hint,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              decoration: InputDecoration(
+                prefixIcon: icon != null ? Icon(icon) : null,
+                filled: true,
+                fillColor: Colors.white,
+                hintText: hint,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              maxLines: maxLines ?? 1,
+              validator: validator,
+              readOnly: readOnly,
+              textCapitalization: textCapitalization,
+            ),
           ),
-        ),
-        maxLines: maxLines ?? 1,
-        validator: validator,
-        readOnly: readOnly, // Set readOnly pada TextFormField
+          if (buttonText != null && onButtonPressed != null) ...[
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: onButtonPressed,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(buttonText),
+            ),
+          ]
+        ],
       ),
     );
   }

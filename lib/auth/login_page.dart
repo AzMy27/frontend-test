@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Error'),
+        title: const Text('Login Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -71,9 +71,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginButton() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       final response = await http
           .post(
@@ -91,11 +89,9 @@ class _LoginPageState extends State<LoginPage> {
             const Duration(seconds: 10),
             onTimeout: () => throw Exception('Connection timeout'),
           );
-
       final responseData = jsonDecode(response.body);
 
       if (!mounted) return;
-
       if (response.statusCode == 200 && responseData['status'] == 'success') {
         await _saveUserData(responseData);
         _navigateToHome();
@@ -103,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
         _showErrorDialog(responseData['message'] ?? 'Login failed');
       }
     } catch (e) {
+      // print('Login Error: $e');
       _showErrorDialog(
         e.toString().contains('timeout')
             ? 'Connection timeout. Please check your internet connection.'
@@ -116,11 +113,13 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _saveUserData(Map<String, dynamic> data) async {
     final prefs = await SharedPreferences.getInstance();
     await Future.wait([
-      prefs.setString('token', data['token']),
-      prefs.setString('username', data['user']['name']),
-      prefs.setString('email', data['user']['email']),
-      prefs.setString('image', data['user']['image']),
+      prefs.setString('token', data['token'].toString()),
+      prefs.setString('id', data['user']['id'].toString()),
+      prefs.setString('username', data['user']['name'].toString()),
+      prefs.setString('email', data['user']['email'].toString()),
+      prefs.setString('image', (data['user']['image'] ?? '').toString()),
     ]);
+    // print('Token tersimpan: ${data['token']}');
   }
 
   void _navigateToHome() {
@@ -139,10 +138,10 @@ class _LoginPageState extends State<LoginPage> {
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0XFFF95A3B), Color(0XFFF96713)],
+              colors: [Color(0XFFFFF3E0), Color(0XFFFFECB3)],
               begin: FractionalOffset.topLeft,
               end: FractionalOffset.bottomCenter,
-              stops: [0.0, 0.8],
+              stops: [0.2, 0.8],
               tileMode: TileMode.mirror,
             ),
           ),
@@ -153,9 +152,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    CommonLogo(),
-                    const HeightBox(10.0),
-                    "Email Sign in".text.size(22).yellow100.make(),
+                    CommonLogo().pOnly(bottom: 15),
+                    "Login Pengguna".text.size(22).black.make().pOnly(bottom: 10),
                     _buildEmailField(),
                     _buildPasswordField(),
                     _buildLoginButton(),

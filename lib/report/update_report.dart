@@ -8,7 +8,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
-import 'package:geolocator/geolocator.dart'; // Import Geolocator
+import 'package:geolocator/geolocator.dart';
 
 class UpdateReport extends StatefulWidget {
   final Reports? report;
@@ -22,15 +22,17 @@ class UpdateReport extends StatefulWidget {
 class _UpdateReportState extends State<UpdateReport> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _coordinateController = TextEditingController(); // Controller untuk koordinat
+  final TextEditingController _coordinateController = TextEditingController();
+  final TextEditingController _targetController = TextEditingController();
+  final TextEditingController _purposeController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Populate the fields with the existing report data
     if (widget.report != null) {
       _titleController.text = widget.report!.title;
       _placeController.text = widget.report!.place;
@@ -46,7 +48,7 @@ class _UpdateReportState extends State<UpdateReport> {
     _placeController.dispose();
     _dateController.dispose();
     _descriptionController.dispose();
-    _coordinateController.dispose(); // Dispose koordinat controller
+    _coordinateController.dispose();
     super.dispose();
   }
 
@@ -72,25 +74,26 @@ class _UpdateReportState extends State<UpdateReport> {
 
   Future<void> _updateReport() async {
     if (_formKey.currentState!.validate()) {
-      // Get the current provider
       final provider = context.read<ReportProvider>();
 
-      // Call the API to update the report
       final success = await provider.updateReport(
         reportId: widget.report!.id!,
         title: _titleController.text,
+        type: _typeController.text,
         place: _placeController.text,
         date: _dateController.text,
         description: _descriptionController.text,
         images: provider.images,
         coordinatePoint: _coordinateController.text,
+        target: _targetController.text,
+        purpose: _purposeController.text,
       );
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Laporan berhasil diperbarui')),
         );
-        Navigator.pop(context); // Go back to the previous screen
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal memperbarui laporan: ${provider.errorMessage}')),
@@ -121,7 +124,7 @@ class _UpdateReportState extends State<UpdateReport> {
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      _coordinateController.text = '${position.latitude}, ${position.longitude}'; // Set koordinat ke text field
+      _coordinateController.text = '${position.latitude}, ${position.longitude}';
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal mendapatkan lokasi: $e')),
@@ -134,7 +137,7 @@ class _UpdateReportState extends State<UpdateReport> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Update Laporan'),
+          title: const Text('Perbaiki Laporan'),
         ),
         body: Container(
           width: MediaQuery.of(context).size.width,
@@ -156,7 +159,7 @@ class _UpdateReportState extends State<UpdateReport> {
                 children: <Widget>[
                   const SizedBox(height: 50),
                   const Text(
-                    'Update Laporan Kegiatan',
+                    'Perbaiki Laporan Kegiatan',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -187,10 +190,10 @@ class _UpdateReportState extends State<UpdateReport> {
                     },
                   ),
                   _buildTextField(
-                    controller: _coordinateController, // Controller untuk koordinat
-                    icon: Icons.map, // Ikon untuk koordinat
+                    controller: _coordinateController,
+                    icon: Icons.map,
                     hint: 'Titik Koordinat',
-                    readOnly: true, // Membuat field ini hanya bisa dibaca
+                    readOnly: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Titik koordinat tidak boleh kosong';
@@ -271,7 +274,8 @@ class _UpdateReportState extends State<UpdateReport> {
     IconData? icon,
     int? maxLines,
     String? Function(String?)? validator,
-    bool readOnly = false, // Tambahkan parameter readOnly
+    bool readOnly = false,
+    TextCapitalization textCapitalization = TextCapitalization.sentences,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -289,7 +293,8 @@ class _UpdateReportState extends State<UpdateReport> {
         ),
         maxLines: maxLines ?? 1,
         validator: validator,
-        readOnly: readOnly, // Set readOnly pada TextFormField
+        readOnly: readOnly,
+        textCapitalization: textCapitalization,
       ),
     );
   }

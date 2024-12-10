@@ -1,4 +1,7 @@
+import 'package:android_fe/password/change_password.dart';
+import 'package:android_fe/password/forgot_password.dart';
 import 'package:flutter/material.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -12,8 +15,56 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pengaturan'),
+        title: 'Pengaturan'.text.make(),
       ),
+      body: VStack([
+        'Keamanan Akun'.text.bold.xl.make().p16().box.margin(const EdgeInsets.only(bottom: 8)).make(),
+
+        // Ganti Password
+        ListTile(
+          leading: const Icon(Icons.lock_outline),
+          title: 'Ganti Password'.text.make(),
+          subtitle: 'Ubah password anda'.text.sm.gray500.make(),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ChangePassword(),
+              ),
+            );
+          },
+        ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
+
+        // Lupa Password
+        ListTile(
+          leading: const Icon(Icons.help_outline_sharp),
+          title: 'Lupa Password'.text.make(),
+          subtitle: 'Atur ulang password anda'.text.sm.gray500.make(),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ForgotPassword(),
+              ),
+            );
+          },
+        ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
+
+        const Divider().py12(),
+        'Lainnya'.text.bold.xl.make().p16().box.margin(const EdgeInsets.only(bottom: 8)).make(),
+        // Akan Datang
+        ListTile(
+          leading: const Icon(Icons.next_plan_outlined),
+          title: 'Akan Datang'.text.make(),
+          subtitle: 'Akan Datang'.text.sm.gray500.make(),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            // TODO: Implement language selection
+          },
+        ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
+      ]).scrollVertical().p16(),
     );
   }
 }

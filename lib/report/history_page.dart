@@ -1,9 +1,10 @@
 import 'package:android_fe/model/report_model.dart';
-import 'package:android_fe/report/crud/get_all_report.dart';
+import 'package:android_fe/report/crud/get_report.dart';
 import 'package:android_fe/report/show_report.dart';
 import 'package:android_fe/report/update_report.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -27,6 +28,8 @@ class _HistoryPageState extends State<HistoryPage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
+    print('Token dai: $token');
+
     if (token == null || token.isEmpty) {
       setState(() {
         _token = null;
@@ -34,7 +37,6 @@ class _HistoryPageState extends State<HistoryPage> {
       return;
     }
 
-    // If the token is valid, call fetchReports
     setState(() {
       _token = token;
       futureReports = get_reports.fetchReports(_token!);
@@ -81,85 +83,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       itemCount: reports.length,
                       itemBuilder: (context, index) {
                         final report = reports[index];
-                        debugPrint(
-                            'validasiDesa: ${report.validasiDesa}, validasiKecamatan: ${report.validasiKecamatan}');
-
-                        return Card(
-                          color: _getCardColor(report.validasiDesa, report.validasiKecamatan),
-                          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: ListTile(
-                            leading: _buildStatusIndicator(report.validasiDesa, report.validasiKecamatan),
-                            title: Text(
-                              report.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Lokasi: ${report.place}'),
-                                Text('Tanggal: ${report.date}'),
-                                if (report.validasiDesa == 'ditolak' || report.validasiKecamatan == 'ditolak')
-                                  const Text(
-                                    'Status: Ditolak',
-                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                                  )
-                                else if (report.validasiDesa == 'diterima' && report.validasiKecamatan == null)
-                                  const Text(
-                                    'Status: Diterima, Belum Divalidasi oleh Kecamatan',
-                                    style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-                                  )
-                                else if (report.validasiDesa == 'diterima' && report.validasiKecamatan == 'diterima')
-                                  const Text(
-                                    'Status: Diterima',
-                                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                                  )
-                                else if (report.validasiDesa == null && report.validasiKecamatan == null)
-                                  Text(
-                                    'Status: Belum divalidasi',
-                                    style: TextStyle(color: Colors.grey.shade100, fontWeight: FontWeight.bold),
-                                  )
-                              ],
-                            ),
-                            trailing: (report.validasiDesa == 'ditolak' || report.validasiKecamatan == 'ditolak')
-                                ? IconButton(
-                                    icon: const Icon(Icons.edit, color: Colors.black),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => UpdateReport(report: report),
-                                        ),
-                                      ).then((_) {
-                                        // Refresh the reports after returning from the update page
-                                        _refreshReports();
-                                      });
-                                    },
-                                  )
-                                : null,
-                            onTap: () async {
-                              // Navigate to report detail
-                              if (_token == null || report.id == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('ID laporan tidak valid')),
-                                );
-                                return;
-                              }
-                              try {
-                                final reportDetail = await get_reports.fetchReportsById(_token!, report.id!);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DetailReportPage(report: reportDetail),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Gagal memuat detail laporan: $e')),
-                                );
-                              }
-                            },
-                          ),
-                        );
+                        return _buildCard(report, context, _token, _refreshReports);
                       },
                     );
                   },
@@ -172,13 +96,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
 Color _getCardColor(String desaStatus, String kecamatanStatus) {
   if (desaStatus == 'ditolak' || kecamatanStatus == 'ditolak') {
-    return Colors.red.shade100; // Light red for rejected
+    return Colors.red.shade100;
   } else if (desaStatus == 'diterima' && kecamatanStatus == 'diterima') {
-    return Colors.green.shade100; // Light green for fully approved
+    return Colors.green.shade100;
   } else if (desaStatus == 'diterima' || kecamatanStatus == 'ditolak') {
-    return Colors.yellow.shade100; // Light yellow for partial approval
+    return Colors.yellow.shade100;
   }
-  return Colors.grey.shade100; // Light grey for unvalidated
+  return Colors.grey.shade100;
 }
 
 Widget _buildStatusIndicator(String desaStatus, String kecamatanStatus) {
@@ -202,4 +126,69 @@ Widget _buildStatusIndicator(String desaStatus, String kecamatanStatus) {
       shape: BoxShape.circle,
     ),
   );
+}
+
+Widget _buildCard(Reports report, BuildContext context, String? token, Function refreshReports) {
+  return VxBox(
+    child: VStack([
+      HStack([
+        _buildStatusIndicator(report.validasiDesa, report.validasiKecamatan),
+        10.widthBox,
+        VStack([
+          report.title.text.bold.xl.make(),
+          'Lokasi: ${report.place}'.text.sm.make(),
+          'Tanggal: ${report.date}'.text.sm.make(),
+          if (report.validasiDesa == 'ditolak' || report.validasiKecamatan == 'ditolak')
+            'Status: Ditolak'.text.red500.bold.make()
+          else if (report.validasiDesa == 'diterima' && report.validasiKecamatan == null)
+            'Status: Diterima, Belum Divalidasi oleh Kecamatan'.text.orange500.bold.make()
+          else if (report.validasiDesa == 'diterima' && report.validasiKecamatan == 'diterima')
+            'Status: Diterima'.text.green500.bold.make()
+          else if (report.validasiDesa == null && report.validasiKecamatan == null)
+            'Status: Belum divalidasi'.text.gray500.bold.make(),
+        ]).expand()
+      ]),
+      if (report.validasiDesa == 'ditolak' || report.validasiKecamatan == 'ditolak')
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.edit, color: Colors.black)
+                .onInkTap(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UpdateReport(report: report),
+                    ),
+                  ).then((_) => refreshReports());
+                })
+                .box
+                .padding(const EdgeInsets.symmetric(horizontal: 16, vertical: 1))
+                .roundedSM
+                .make()
+          ],
+        )
+    ]),
+  )
+      .color(_getCardColor(report.validasiDesa, report.validasiKecamatan))
+      .margin(Vx.m4)
+      .padding(const EdgeInsets.all(12))
+      .roundedSM
+      .make()
+      .onTap(() async {
+    if (token == null || report.id == null) {
+      VxToast.show(context, msg: "ID laporan tidak valid");
+      return;
+    }
+    try {
+      final reportDetail = await getReports().fetchReportsById(token, report.id!);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetailReportPage(report: reportDetail),
+        ),
+      );
+    } catch (e) {
+      VxToast.show(context, msg: "Gagal memuat detail laporan: $e");
+    }
+  });
 }

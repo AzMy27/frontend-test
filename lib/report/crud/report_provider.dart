@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportProvider extends ChangeNotifier {
   List<File> _images = [];
-  // List<Map<String, dynamic>> _images = []; // Menyimpan file dan URL
   bool _isLoading = false;
   bool _hasValidationError = false;
   String? _token;
@@ -17,7 +16,6 @@ class ReportProvider extends ChangeNotifier {
   List<Reports> get reports => _reports;
 
   List<File> get images => _images;
-  // List<Map<String, dynamic>> get images => _images;
   bool get isLoading => _isLoading;
   bool get hasValidationError => _hasValidationError;
   String? get errorMessage => _errorMessage;
@@ -86,11 +84,14 @@ class ReportProvider extends ChangeNotifier {
 
   Future<bool> submitReport({
     required String title,
+    required String type,
     required String place,
     required String date,
     required String description,
     required List<File> images,
     required String coordinatePoint,
+    required String target,
+    required String purpose,
   }) async {
     if (_token == null) {
       setValidationError(true, 'Authentication token not found');
@@ -119,10 +120,13 @@ class ReportProvider extends ChangeNotifier {
 
       request.fields.addAll({
         'title': title,
+        'type': type,
         'place': place,
         'date': date,
         'description': description,
-        'coordinate_point': coordinatePoint, // Sertakan koordinat di sini
+        'coordinate_point': coordinatePoint,
+        'target': target,
+        'purpose': purpose,
       });
 
       for (var i = 0; i < images.length; i++) {
@@ -165,11 +169,14 @@ class ReportProvider extends ChangeNotifier {
   Future<bool> updateReport({
     required int reportId,
     required String title,
+    required String type,
     required String place,
     required String date,
     required String description,
     required List<File> images,
     required String coordinatePoint,
+    required String target,
+    required String purpose,
   }) async {
     if (_token == null) {
       setValidationError(true, 'Authentication token not found');
@@ -193,10 +200,13 @@ class ReportProvider extends ChangeNotifier {
 
       request.fields.addAll({
         'title': title,
+        'type': type,
         'place': place,
         'date': date,
         'description': description,
         'coordinate_point': coordinatePoint,
+        'target': target,
+        'purpose': purpose,
       });
 
       // Add images if provided
