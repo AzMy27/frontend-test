@@ -5,6 +5,7 @@ import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/edit_biodata.dart';
 import 'package:android_fe/profil/settings.dart';
+import 'package:android_fe/widget/image_token.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -22,9 +23,19 @@ class _ProfilePageState extends State<ProfilePage> {
   String _profilImage = 'images/polbeng.png';
 
   @override
+  @override
   void initState() {
     super.initState();
+    _validateToken();
     _loadUserProfile();
+  }
+
+  Future<void> _validateToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) {
+      _redirectToLogin();
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -32,9 +43,13 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _username = prefs.getString('username') ?? 'Pengguna';
       _email = prefs.getString('email') ?? 'Email tidak ditemukan';
-      _profilImage = prefs.getString('foto_dai') != null && prefs.getString('foto_dai')!.isNotEmpty
-          ? prefs.getString('foto_dai')!
-          : 'images/polbeng.png';
+
+      String? fotoDai = prefs.getString('foto_dai');
+      if (fotoDai != null && fotoDai.isNotEmpty) {
+        _profilImage = fotoDai;
+      } else {
+        _profilImage = 'images/polbeng.png';
+      }
     });
   }
 
@@ -42,12 +57,8 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('token');
-
       if (token == null) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-          (Route<dynamic> route) => false,
-        );
+        _redirectToLogin();
         return;
       }
 
@@ -62,11 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode == 200) {
         await prefs.remove('token');
-
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-          (Route<dynamic> route) => false,
-        );
+        _redirectToLogin();
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         throw Exception(responseData['message'] ?? 'Logout failed');
@@ -79,6 +86,13 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
     }
+  }
+
+  void _redirectToLogin() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override
@@ -113,23 +127,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(
                   width: 120,
                   height: 120,
+// di profile_page.dart
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(100),
                     child: _profilImage.startsWith('http')
-                        ? Image.network(
-                            _profilImage,
+                        ? ImageWithToken(
+                            imageUrl: _profilImage,
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'images/polbeng.png', // Gambar default jika gagal memuat
-                                fit: BoxFit.cover,
-                              );
-                            },
                           )
                         : Image.asset(
-                            _profilImage, // Jika bukan URL, gunakan gambar lokal
+                            _profilImage,
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
@@ -228,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
 class ProfileMenuWidget extends StatelessWidget {
   final String title;
   final IconData icon;
-  final Color? textColor; // Specify the type as Color
+  final Color? textColor;
   final VoidCallback? onPressed;
 
   const ProfileMenuWidget({
