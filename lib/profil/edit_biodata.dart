@@ -72,7 +72,6 @@ class _BiodataPageState extends State<BiodataPage> {
       final daiProvider = Provider.of<DaiProvider>(context, listen: false);
 
       bool success = await daiProvider.updateDaiProfile(
-        nik: _nikController.text,
         nama: _namaController.text,
         noHp: _noHpController.text,
         alamat: _alamatController.text,
@@ -191,6 +190,7 @@ class _BiodataPageState extends State<BiodataPage> {
                       icon: Icons.credit_card,
                       hint: 'NIK',
                       validator: (value) => value == null || value.isEmpty ? "NIK tidak boleh kosong" : null,
+                      readOnly: true,
                     ),
                     _buildTextField(
                       controller: _namaController,
@@ -265,6 +265,7 @@ class _BiodataPageState extends State<BiodataPage> {
     String? Function(String?)? validator,
     int? maxLines = 1,
     TextInputType? keyboardType,
+    readOnly,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),

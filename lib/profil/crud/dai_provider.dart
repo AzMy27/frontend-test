@@ -59,7 +59,6 @@ class DaiProvider extends ChangeNotifier {
           throw Exception('No profile data found');
         }
       } else {
-        // Parse error message from the response
         final errorData = json.decode(response.body);
         throw Exception(errorData['message'] ?? 'Failed to load Dai profile');
       }
@@ -73,7 +72,6 @@ class DaiProvider extends ChangeNotifier {
   }
 
   Future<bool> updateDaiProfile({
-    required String nik,
     required String nama,
     required String noHp,
     required String alamat,
@@ -83,7 +81,6 @@ class DaiProvider extends ChangeNotifier {
     required String statusKawin,
     File? fotoDai,
   }) async {
-    // Reset state before updating
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -98,15 +95,13 @@ class DaiProvider extends ChangeNotifier {
         Uri.parse('${ApiConstants.updateDai}'),
       );
 
-      // Add headers
       request.headers.addAll({
         'Authorization': 'Bearer $_token',
         'Accept': 'application/json',
       });
 
-      // Add text fields
+      // Only include fields that can be updated
       request.fields.addAll({
-        'nik': nik,
         'nama': nama,
         'no_hp': noHp,
         'alamat': alamat,
@@ -116,7 +111,6 @@ class DaiProvider extends ChangeNotifier {
         'status_kawin': statusKawin,
       });
 
-      // Add image if provided
       if (fotoDai != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -127,16 +121,18 @@ class DaiProvider extends ChangeNotifier {
         );
       }
 
-      // Send the request
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        // Update local profile if server response is successful
         if (responseData['data'] != null) {
           _daiProfile = Dai.fromJson(responseData['data']);
+          final prefs = await SharedPreferences.getInstance();
+          if (_daiProfile?.fotoDai != null) {
+            await prefs.setString('foto_dai', _daiProfile!.fotoDai!);
+          }
         }
         return true;
       } else {

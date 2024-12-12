@@ -114,12 +114,9 @@ class _LoginPageState extends State<LoginPage> {
     final prefs = await SharedPreferences.getInstance();
     await Future.wait([
       prefs.setString('token', data['token'].toString()),
-      prefs.setString('id', data['user']['id'].toString()),
       prefs.setString('username', data['user']['name'].toString()),
       prefs.setString('email', data['user']['email'].toString()),
-      prefs.setString('image', (data['user']['image'] ?? '').toString()),
     ]);
-    // print('Token tersimpan: ${data['token']}');
   }
 
   void _navigateToHome() {
