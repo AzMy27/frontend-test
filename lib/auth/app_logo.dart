@@ -8,8 +8,6 @@ class CommonLogo extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Image.asset('images/bengkalis-bermasa.png').pOnly(bottom: 10),
-        // "Aplikasi Dai Bermasa".text.xl2.orange700.italic.make(),
-        // "Slogan?".text.light.white.wider.lg.make(),
       ],
     );
   }

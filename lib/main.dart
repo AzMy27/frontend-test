@@ -17,8 +17,10 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    print("Firebase initialized successfully");
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      print("Firebase initialized successfully");
+    }
     await FirebaseApi().initNotification().then((_) {
       print("Firebase notification initialization complete");
     }).catchError((error) {
@@ -31,7 +33,6 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
   initializeDateFormatting('id_ID', null).then((_) => runApp(MyApp(token: token)));
-  // runApp(MyApp(token: token));
 }
 
 class MyApp extends StatelessWidget {

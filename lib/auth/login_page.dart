@@ -99,7 +99,6 @@ class _LoginPageState extends State<LoginPage> {
         _showErrorDialog(responseData['message'] ?? 'Login failed');
       }
     } catch (e) {
-      // print('Login Error: $e');
       _showErrorDialog(
         e.toString().contains('timeout')
             ? 'Connection timeout. Please check your internet connection.'
