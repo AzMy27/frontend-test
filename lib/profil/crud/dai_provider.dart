@@ -11,7 +11,6 @@ class DaiProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String? _token;
-  bool _isTokenLoad = false;
 
   // Getters
   Dai? get daiProfile => _daiProfile;
@@ -25,24 +24,32 @@ class DaiProvider extends ChangeNotifier {
   Future<void> _loadToken() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
-    _isTokenLoad = true;
+    notifyListeners();
+  }
+
+  void clearProviderData() {
+    _daiProfile = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _token = null;
     notifyListeners();
   }
 
   Future<void> fetchDaiProfile() async {
-    if (!_isTokenLoad) {
+    if (_token == null) {
       await _loadToken();
+      if (_token == null) {
+        _errorMessage = 'Unauthenticated';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
     }
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      if (_token == null) {
-        final prefs = await SharedPreferences.getInstance();
-        _token = prefs.getString('token');
-      }
-
       final response = await http.get(
         Uri.parse(ApiConstants.showDai),
         headers: {
@@ -127,6 +134,7 @@ class DaiProvider extends ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
         if (responseData['data'] != null) {
           _daiProfile = Dai.fromJson(responseData['data']);
           final prefs = await SharedPreferences.getInstance();

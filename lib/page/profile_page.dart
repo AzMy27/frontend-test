@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
+import 'package:android_fe/profil/crud/dai_provider.dart';
 import 'package:android_fe/profil/edit_biodata.dart';
 import 'package:android_fe/profil/settings.dart';
 import 'package:android_fe/widget/image_token.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,7 +24,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String _email = '';
   String _profilImage = 'images/polbeng.png';
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -40,24 +41,36 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
+    final daiProvider = Provider.of<DaiProvider>(context, listen: false);
+
     setState(() {
       _username = prefs.getString('username') ?? 'Pengguna';
       _email = prefs.getString('email') ?? 'Email tidak ditemukan';
-
-      String? fotoDai = prefs.getString('foto_dai');
+      String? fotoDai = daiProvider.daiProfile?.fotoDai ?? prefs.getString('foto_dai');
       if (fotoDai != null && fotoDai.isNotEmpty) {
         _profilImage = fotoDai;
       } else {
-        _profilImage = 'images/polbeng.png';
+        _profilImage = 'images/polbeng.png'; // Default image
       }
     });
   }
 
   Future<void> _logoutSubmit() async {
     try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('token');
       if (token == null) {
+        Navigator.of(context).pop();
         _redirectToLogin();
         return;
       }
@@ -71,18 +84,24 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
 
+      Navigator.of(context).pop();
       if (response.statusCode == 200) {
-        await prefs.remove('token');
+        await prefs.clear();
+        Provider.of<DaiProvider>(context, listen: false).clearProviderData();
         _redirectToLogin();
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         throw Exception(responseData['message'] ?? 'Logout failed');
       }
     } catch (e) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error during logout: ${e.toString()}'),
           backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
         ),
       );
     }
@@ -127,7 +146,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(
                   width: 120,
                   height: 120,
-// di profile_page.dart
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(100),
                     child: _profilImage.startsWith('http')
@@ -138,7 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             fit: BoxFit.cover,
                           )
                         : Image.asset(
-                            _profilImage,
+                            'images/polbeng.png',
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
@@ -266,7 +284,7 @@ class ProfileMenuWidget extends StatelessWidget {
         title,
         style: TextStyle(
           fontSize: 16,
-          color: textColor ?? Colors.black, // Apply textColor here
+          color: textColor ?? Colors.black,
         ),
       ),
       trailing: Container(
@@ -285,4 +303,3 @@ class ProfileMenuWidget extends StatelessWidget {
     );
   }
 }
-

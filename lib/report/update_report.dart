@@ -35,16 +35,22 @@ class _UpdateReportState extends State<UpdateReport> {
     super.initState();
     if (widget.report != null) {
       _titleController.text = widget.report!.title;
+      _typeController.text = widget.report!.type;
       _placeController.text = widget.report!.place;
       _dateController.text = widget.report!.date;
       _descriptionController.text = widget.report!.description;
       _coordinateController.text = widget.report!.coordinatePoint ?? '';
+      _targetController.text = widget.report!.target;
+      _purposeController.text = widget.report!.purpose;
     }
   }
 
   @override
   void dispose() {
     _titleController.dispose();
+    _typeController.dispose();
+    _targetController.dispose();
+    _purposeController.dispose();
     _placeController.dispose();
     _dateController.dispose();
     _descriptionController.dispose();
@@ -179,12 +185,45 @@ class _UpdateReportState extends State<UpdateReport> {
                     },
                   ),
                   _buildTextField(
+                    controller: _typeController,
+                    icon: Icons.type_specimen,
+                    hint: 'Tipe Kegiatan',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tipe tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  _buildTextField(
                     controller: _placeController,
                     icon: Icons.location_on,
                     hint: 'Lokasi',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Lokasi tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  _buildTextField(
+                    controller: _targetController,
+                    icon: Icons.people_alt_outlined,
+                    hint: 'Target',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Target tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  _buildTextField(
+                    controller: _purposeController,
+                    hint: 'Tujuan',
+                    icon: Icons.rocket_launch_outlined,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tujuan tidak boleh kosong';
                       }
                       return null;
                     },

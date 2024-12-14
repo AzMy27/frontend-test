@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "D:/7. tugas/frontend-apps/android_fe/linux"
+  "cmake.sourceDirectory": "D:/7. tugas/frontend-apps/android_fe/linux",
+  "java.configuration.updateBuildConfiguration": "automatic"
 }

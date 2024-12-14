@@ -106,14 +106,25 @@ class _BiodataPageState extends State<BiodataPage> {
       ),
       body: Consumer<DaiProvider>(
         builder: (context, daiProvider, child) {
+          if (daiProvider.isLoading == 'Unauthenticated') {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Session Expired. Please Login Again'),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Navigate to login page
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    child: Text('Go to Login'),
+                  )
+                ],
+              ),
+            );
+          }
           if (daiProvider.isLoading) {
             return Center(child: CircularProgressIndicator());
-          }
-
-          if (daiProvider.errorMessage != null) {
-            return Center(
-              child: Text('Error: ${daiProvider.errorMessage}'),
-            );
           }
 
           final dai = daiProvider.daiProfile;

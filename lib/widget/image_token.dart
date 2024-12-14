@@ -21,10 +21,15 @@ class ImageWithToken extends StatelessWidget {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
       future: _getToken(),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+
         if (!snapshot.hasData) {
           return Image.asset(
             'images/polbeng.png',
@@ -41,8 +46,20 @@ class ImageWithToken extends StatelessWidget {
           fit: fit,
           headers: {
             'Authorization': 'Bearer ${snapshot.data}',
+            'Accept': 'application/json',
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            );
           },
           errorBuilder: (context, error, stackTrace) {
+            print('Image load error: $error'); // Add this for debugging
             return Image.asset(
               'images/polbeng.png',
               width: width,
