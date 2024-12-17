@@ -59,7 +59,7 @@ class ImageWithToken extends StatelessWidget {
             );
           },
           errorBuilder: (context, error, stackTrace) {
-            print('Image load error: $error'); // Add this for debugging
+            print('Image load error: $error');
             return Image.asset(
               'images/polbeng.png',
               width: width,

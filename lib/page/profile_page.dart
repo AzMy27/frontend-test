@@ -29,6 +29,10 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _validateToken();
     _loadUserProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final daiProvider = Provider.of<DaiProvider>(context, listen: false);
+      await daiProvider.fetchDaiProfile();
+    });
   }
 
   Future<void> _validateToken() async {
@@ -50,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (fotoDai != null && fotoDai.isNotEmpty) {
         _profilImage = fotoDai;
       } else {
-        _profilImage = 'images/polbeng.png'; // Default image
+        _profilImage = 'images/polbeng.png';
       }
     });
   }
@@ -148,31 +152,45 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 120,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(100),
-                    child: _profilImage.startsWith('http')
-                        ? ImageWithToken(
-                            imageUrl: _profilImage,
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
+                    child: Consumer<DaiProvider>(
+                      builder: (context, daiProvider, child) {
+                        final dai = daiProvider.daiProfile;
+                        if (dai == null || dai.fotoDai == null || dai.fotoDai!.isEmpty) {
+                          return Image.asset(
                             'images/polbeng.png',
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
-                          ),
+                          );
+                        }
+                        return Image.network(
+                          dai.fotoDai!,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'images/polbeng.png',
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  _username, // Tampilkan nama pengguna
+                  _username,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  _email, // Tampilkan email pengguna
+                  _email,
                   style: const TextStyle(
                     fontSize: 16,
                   ),
@@ -207,7 +225,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
                 const Divider(),
                 const SizedBox(height: 10),
-                // Menu
                 ProfileMenuWidget(
                   title: 'Settings',
                   icon: Icons.settings,

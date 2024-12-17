@@ -12,7 +12,6 @@ class DaiProvider extends ChangeNotifier {
   String? _errorMessage;
   String? _token;
 
-  // Getters
   Dai? get daiProfile => _daiProfile;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -107,7 +106,6 @@ class DaiProvider extends ChangeNotifier {
         'Accept': 'application/json',
       });
 
-      // Only include fields that can be updated
       request.fields.addAll({
         'nama': nama,
         'no_hp': noHp,

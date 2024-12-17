@@ -24,7 +24,6 @@ class getReports {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // Validasi apakah `data['data']` adalah daftar
         if (data['data'] == null || data['data'] is! List) {
           throw Exception('Format response tidak valid');
         }

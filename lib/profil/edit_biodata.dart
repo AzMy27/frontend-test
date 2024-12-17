@@ -114,7 +114,6 @@ class _BiodataPageState extends State<BiodataPage> {
                   Text('Session Expired. Please Login Again'),
                   ElevatedButton(
                     onPressed: () {
-                      // Navigate to login page
                       Navigator.of(context).pushReplacementNamed('/login');
                     },
                     child: Text('Go to Login'),
@@ -195,7 +194,6 @@ class _BiodataPageState extends State<BiodataPage> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    // Form Fields
                     _buildTextField(
                       controller: _nikController,
                       icon: Icons.credit_card,
@@ -334,7 +332,6 @@ class _BiodataPageState extends State<BiodataPage> {
 
   @override
   void dispose() {
-    // Dispose controllers to prevent memory leaks
     _nikController.dispose();
     _namaController.dispose();
     _noHpController.dispose();

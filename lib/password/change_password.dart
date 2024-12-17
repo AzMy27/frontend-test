@@ -1,6 +1,7 @@
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -32,6 +33,11 @@ class _ChangePasswordState extends State<ChangePassword> {
       try {
         String? token = await _getStoredToken();
 
+        if (token == null) {
+          _showErrorDialog('Anda harus login terlebih dahulu');
+          return;
+        }
+
         final response = await _dio.post(
           ApiConstants.changePassword,
           data: {
@@ -48,46 +54,67 @@ class _ChangePasswordState extends State<ChangePassword> {
           ),
         );
 
+        // print('Response: ${response.data}');
+
         if (response.statusCode == 200) {
           _showSuccessDialog();
         }
       } on DioException catch (e) {
+        // print('DioError: ${e.toString()}');
         String errorMessage = 'Gagal mengubah password';
 
         if (e.response != null) {
-          if (e.response?.statusCode == 400) {
-            errorMessage = e.response?.data['message'] ?? 'Password saat ini salah';
-          } else if (e.response?.statusCode == 422) {
-            errorMessage = 'Validasi gagal. Periksa kembali password Anda.';
+          // print('Error Response: ${e.response?.data}');
+          switch (e.response?.statusCode) {
+            case 400:
+              errorMessage = e.response?.data['message'] ?? 'Password saat ini salah';
+              break;
+            case 401:
+              errorMessage = 'Unauthorized. Silakan login kembali.';
+              break;
+            case 422:
+              errorMessage = 'Validasi gagal. Periksa kembali password Anda.';
+              break;
+            default:
+              errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
           }
+        } else {
+          errorMessage = e.message ?? 'Koneksi bermasalah';
         }
 
         _showErrorDialog(errorMessage);
+      } catch (e) {
+        // print('Unexpected Error: ${e.toString()}');
+        _showErrorDialog('Terjadi kesalahan yang tidak terduga');
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
 
   Future<String?> _getStoredToken() async {
-    return null; // Implement token retrieval logic
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 
   void _showSuccessDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: 'Berhasil'.text.bold.make(),
-        content: 'Password berhasil diubah'.text.make(),
+        title: Text('Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('Password berhasil diubah'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              // Ensure we pop both the dialog and the current screen
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop(); // Close the change password screen
             },
-            child: 'OK'.text.make(),
+            child: Text('OK'),
           ),
         ],
       ),
@@ -98,12 +125,12 @@ class _ChangePasswordState extends State<ChangePassword> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: 'Kesalahan'.text.bold.red500.make(),
-        content: message.text.make(),
+        title: Text('Kesalahan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: 'OK'.text.make(),
+            child: Text('OK'),
           ),
         ],
       ),
@@ -141,7 +168,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                 return null;
               },
             ).pOnly(bottom: 16),
-
             'Password Baru'.text.bold.make().pOnly(bottom: 5),
             TextFormField(
               controller: _newPasswordController,
@@ -164,7 +190,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                 return null;
               },
             ).pOnly(bottom: 16),
-
             'Konfirmasi Password Baru'.text.bold.make().pOnly(bottom: 5),
             TextFormField(
               controller: _confirmPasswordController,
@@ -187,8 +212,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                 return null;
               },
             ).pOnly(bottom: 24),
-
-            // Change Password Button
             ElevatedButton(
               onPressed: _isLoading ? null : _changePassword,
               style: ElevatedButton.styleFrom(

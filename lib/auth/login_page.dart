@@ -28,7 +28,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Email validation
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email is required';
@@ -40,7 +39,6 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  // Password validation
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';

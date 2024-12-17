@@ -28,8 +28,6 @@ class _HistoryPageState extends State<HistoryPage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    print('Token dai: $token');
-
     if (token == null || token.isEmpty) {
       setState(() {
         _token = null;
@@ -192,4 +190,3 @@ Widget _buildCard(Reports report, BuildContext context, String? token, Function 
     }
   });
 }
-

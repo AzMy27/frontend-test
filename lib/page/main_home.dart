@@ -49,7 +49,6 @@ class _MainHomeState extends State<MainHome> {
         final reports = await _getReports.fetchReports(token);
         if (reports.isNotEmpty) {
           setState(() {
-            // Sort reports by date and get the most recent one
             _latestReport = reports.reduce(
                 (current, next) => DateTime.parse(current.date).isAfter(DateTime.parse(next.date)) ? current : next);
           });

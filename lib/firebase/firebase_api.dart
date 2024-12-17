@@ -30,7 +30,6 @@ class FirebaseApi {
 
       final details = NotificationDetails(android: androidDetails);
 
-      // Gunakan data atau notification
       final title = message.notification?.title ?? message.data['title'] ?? 'No Title';
       final body = message.notification?.body ?? message.data['body'] ?? 'No Body';
 
@@ -134,7 +133,7 @@ class FirebaseApi {
   void handleMessage(RemoteMessage? message) {
     if (message == null) return;
 
-    final route = message.data['route']; // Misal data notifikasi berisi key `route`
+    final route = message.data['route'];
     if (route != null) {
       navigatorKey.currentState?.pushNamed(route, arguments: message);
     } else {

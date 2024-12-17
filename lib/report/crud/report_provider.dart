@@ -142,7 +142,6 @@ class ReportProvider extends ChangeNotifier {
         }
       }
 
-      // Send request
       final streamedResponse = await request.send().timeout(
             const Duration(seconds: 30),
             onTimeout: () => throw Exception('Request timed out'),
@@ -209,7 +208,6 @@ class ReportProvider extends ChangeNotifier {
         'purpose': purpose,
       });
 
-      // Add images if provided
       for (var i = 0; i < images.length; i++) {
         final file = await http.MultipartFile.fromPath(
           'images[]',
@@ -238,4 +236,3 @@ class ReportProvider extends ChangeNotifier {
     }
   }
 }
-

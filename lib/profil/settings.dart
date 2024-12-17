@@ -19,8 +19,6 @@ class _SettingPageState extends State<SettingPage> {
       ),
       body: VStack([
         'Keamanan Akun'.text.bold.xl.make().p16().box.margin(const EdgeInsets.only(bottom: 8)).make(),
-
-        // Ganti Password
         ListTile(
           leading: const Icon(Icons.lock_outline),
           title: 'Ganti Password'.text.make(),
@@ -35,8 +33,6 @@ class _SettingPageState extends State<SettingPage> {
             );
           },
         ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
-
-        // Lupa Password
         ListTile(
           leading: const Icon(Icons.help_outline_sharp),
           title: 'Lupa Password'.text.make(),
@@ -51,18 +47,14 @@ class _SettingPageState extends State<SettingPage> {
             );
           },
         ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
-
         const Divider().py12(),
         'Lainnya'.text.bold.xl.make().p16().box.margin(const EdgeInsets.only(bottom: 8)).make(),
-        // Akan Datang
         ListTile(
           leading: const Icon(Icons.next_plan_outlined),
           title: 'Akan Datang'.text.make(),
           subtitle: 'Akan Datang'.text.sm.gray500.make(),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            // TODO: Implement language selection
-          },
+          onTap: () {},
         ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
       ]).scrollVertical().p16(),
     );
