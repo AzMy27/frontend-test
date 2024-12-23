@@ -1,5 +1,6 @@
 import 'package:android_fe/auth/app_logo.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
+import 'package:android_fe/main.dart';
 import 'package:android_fe/page/routers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -113,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
       prefs.setString('token', data['token'].toString()),
       prefs.setString('username', data['user']['name'].toString()),
       prefs.setString('email', data['user']['email'].toString()),
+      prefs.setString('token_expired', data['expires_at'].toString()),
     ]);
   }
 
@@ -234,6 +236,45 @@ class _LoginPageState extends State<LoginPage> {
                 textAlign: TextAlign.center,
               ),
       ),
+    );
+  }
+}
+
+class AuthInterceptor {
+  Future<Map<String, String>> getAuthHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
+
+  Future<http.Response> get(String url) async {
+    final headers = await getAuthHeaders();
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 401) {
+      // Token expired, redirect to login
+      await _handleTokenExpired();
+      return http.Response('Token expired', 401);
+    }
+
+    return response;
+  }
+
+  Future<void> _handleTokenExpired() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('username');
+    await prefs.remove('email');
+
+    // Navigasi ke halaman login
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
     );
   }
 }

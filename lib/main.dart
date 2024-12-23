@@ -30,14 +30,52 @@ void main() async {
     print("Firebase initialization error: $e");
   }
 
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token');
-  initializeDateFormatting('id_ID', null).then((_) => runApp(MyApp(token: token)));
+  initializeDateFormatting('id_ID', null).then((_) => runApp(const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
-  final String? token;
-  const MyApp({super.key, this.token});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool? _isTokenValid;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkTokenValidity();
+  }
+
+  Future<void> _checkTokenValidity() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final expiredAt = prefs.getString('token_expired');
+
+    if (token == null || expiredAt == null) {
+      setState(() {
+        _isTokenValid = false;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final expirationDate = DateTime.parse(expiredAt);
+      setState(() {
+        _isTokenValid = expirationDate.isAfter(DateTime.now());
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isTokenValid = false;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +106,13 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: false,
         ),
-        home: token != null ? const RoutersPage() : const LoginPage(),
+        home: _isLoading
+            ? const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : (_isTokenValid == true ? const RoutersPage() : const LoginPage()),
         navigatorKey: navigatorKey,
         routes: {
           '/notification_screen': (context) => const NotificationPage(),

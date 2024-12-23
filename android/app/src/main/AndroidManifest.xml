@@ -10,7 +10,7 @@
  <uses-permission android:name="android.permission.VIBRATE"/>
  <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <application
-        android:label="android_fe"
+        android:label="Dai Bermasa"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

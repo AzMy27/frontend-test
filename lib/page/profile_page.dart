@@ -39,7 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token == null) {
-      _redirectToLogin();
+      await _logoutAndRedirect();
     }
   }
 
@@ -116,6 +116,17 @@ class _ProfilePageState extends State<ProfilePage> {
       MaterialPageRoute(builder: (context) => const LoginPage()),
       (Route<dynamic> route) => false,
     );
+  }
+
+  Future<void> _logoutAndRedirect() async {
+    try {
+      await SharedPreferences.getInstance().then((prefs) => prefs.clear());
+      Provider.of<DaiProvider>(context, listen: false).clearProviderData();
+      _redirectToLogin();
+    } catch (e) {
+      print('Logout error: $e');
+      _redirectToLogin();
+    }
   }
 
   @override
@@ -236,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 ),
                 ProfileMenuWidget(
-                  title: 'Help',
+                  title: 'Tentang',
                   icon: Icons.help,
                   onPressed: () {
                     Navigator.push(

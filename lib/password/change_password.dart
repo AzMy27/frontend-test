@@ -32,7 +32,6 @@ class _ChangePasswordState extends State<ChangePassword> {
 
       try {
         String? token = await _getStoredToken();
-
         if (token == null) {
           _showErrorDialog('Anda harus login terlebih dahulu');
           return;
@@ -54,17 +53,13 @@ class _ChangePasswordState extends State<ChangePassword> {
           ),
         );
 
-        // print('Response: ${response.data}');
-
         if (response.statusCode == 200) {
           _showSuccessDialog();
         }
       } on DioException catch (e) {
-        // print('DioError: ${e.toString()}');
         String errorMessage = 'Gagal mengubah password';
 
         if (e.response != null) {
-          // print('Error Response: ${e.response?.data}');
           switch (e.response?.statusCode) {
             case 400:
               errorMessage = e.response?.data['message'] ?? 'Password saat ini salah';
@@ -110,9 +105,8 @@ class _ChangePasswordState extends State<ChangePassword> {
         actions: [
           TextButton(
             onPressed: () {
-              // Ensure we pop both the dialog and the current screen
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.of(context).pop(); // Close the change password screen
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
             },
             child: Text('OK'),
           ),
@@ -139,90 +133,124 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: 'Ganti Password'.text.make(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: 'Ganti Password'.text.make(),
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Password Saat Ini
+                        Text('Password Saat Ini',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _currentPasswordController,
+                          obscureText: !_isCurrentPasswordVisible,
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan password saat ini',
+                            suffixIcon: IconButton(
+                              icon: Icon(_isCurrentPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _isCurrentPasswordVisible = !_isCurrentPasswordVisible;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return 'Masukkan password saat ini';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Password Baru
+                        Text('Password Baru',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _newPasswordController,
+                          obscureText: !_isNewPasswordVisible,
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan password baru',
+                            suffixIcon: IconButton(
+                              icon: Icon(_isNewPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _isNewPasswordVisible = !_isNewPasswordVisible;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return 'Masukkan password baru';
+                            if (value.length < 8) return 'Password minimal 8 karakter';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Konfirmasi Password Baru
+                        Text('Konfirmasi Password Baru',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _confirmPasswordController,
+                          obscureText: !_isConfirmPasswordVisible,
+                          decoration: InputDecoration(
+                            hintText: 'Konfirmasi password baru',
+                            suffixIcon: IconButton(
+                              icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return 'Konfirmasi password baru';
+                            if (value != _newPasswordController.text) return 'Password tidak cocok';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Tombol Ganti Password
+                        ElevatedButton(
+                          onPressed: _isLoading ? null : _changePassword,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text('Ganti Password', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
-      body: VStack([
-        Form(
-          key: _formKey,
-          child: VStack([
-            'Password Saat Ini'.text.bold.make().pOnly(bottom: 5),
-            TextFormField(
-              controller: _currentPasswordController,
-              obscureText: !_isCurrentPasswordVisible,
-              decoration: InputDecoration(
-                hintText: 'Masukkan password saat ini',
-                suffixIcon: IconButton(
-                  icon: Icon(_isCurrentPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isCurrentPasswordVisible = !_isCurrentPasswordVisible;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Masukkan password saat ini';
-                return null;
-              },
-            ).pOnly(bottom: 16),
-            'Password Baru'.text.bold.make().pOnly(bottom: 5),
-            TextFormField(
-              controller: _newPasswordController,
-              obscureText: !_isNewPasswordVisible,
-              decoration: InputDecoration(
-                hintText: 'Masukkan password baru',
-                suffixIcon: IconButton(
-                  icon: Icon(_isNewPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isNewPasswordVisible = !_isNewPasswordVisible;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Masukkan password baru';
-                if (value.length < 8) return 'Password minimal 8 karakter';
-                return null;
-              },
-            ).pOnly(bottom: 16),
-            'Konfirmasi Password Baru'.text.bold.make().pOnly(bottom: 5),
-            TextFormField(
-              controller: _confirmPasswordController,
-              obscureText: !_isConfirmPasswordVisible,
-              decoration: InputDecoration(
-                hintText: 'Konfirmasi password baru',
-                suffixIcon: IconButton(
-                  icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Konfirmasi password baru';
-                if (value != _newPasswordController.text) return 'Password tidak cocok';
-                return null;
-              },
-            ).pOnly(bottom: 24),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _changePassword,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: _isLoading ? const CircularProgressIndicator() : 'Ganti Password'.text.white.bold.make(),
-            ).wFull(context),
-          ]),
-        ).scrollVertical().p16(),
-      ]),
     );
   }
 

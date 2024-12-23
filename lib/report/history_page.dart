@@ -17,6 +17,7 @@ class _HistoryPageState extends State<HistoryPage> {
   Future<List<Reports>>? futureReports;
   final getReports get_reports = getReports();
   String? _token;
+  bool _isDescending = true; // Default sorting is descending
 
   @override
   void initState() {
@@ -37,16 +38,39 @@ class _HistoryPageState extends State<HistoryPage> {
 
     setState(() {
       _token = token;
-      futureReports = get_reports.fetchReports(_token!);
+      futureReports = _sortReports(get_reports.fetchReports(_token!));
     });
+  }
+
+  Future<List<Reports>> _sortReports(Future<List<Reports>> reportsFuture) async {
+    List<Reports> reports = await reportsFuture;
+
+    // Parse and sort reports by date
+    reports.sort((a, b) {
+      DateTime? dateA = DateTime.tryParse(a.date ?? '');
+      DateTime? dateB = DateTime.tryParse(b.date ?? '');
+
+      if (dateA == null || dateB == null) return 0;
+
+      return _isDescending ? dateB.compareTo(dateA) : dateA.compareTo(dateB);
+    });
+
+    return reports;
   }
 
   Future<void> _refreshReports() async {
     if (_token != null) {
       setState(() {
-        futureReports = get_reports.fetchReports(_token!);
+        futureReports = _sortReports(get_reports.fetchReports(_token!));
       });
     }
+  }
+
+  void _toggleSorting() {
+    setState(() {
+      _isDescending = !_isDescending;
+      futureReports = _sortReports(futureReports!);
+    });
   }
 
   @override
@@ -55,6 +79,13 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Riwayat'),
+          actions: [
+            IconButton(
+              icon: Icon(_isDescending ? Icons.arrow_downward : Icons.arrow_upward),
+              tooltip: _isDescending ? 'Urutkan dari Terbaru ke Terlama' : 'Urutkan dari Terlama ke Terbaru',
+              onPressed: _toggleSorting,
+            ),
+          ],
         ),
         body: _token == null
             ? const Center(
