@@ -259,7 +259,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ProfileMenuWidget(
                   title: 'Akan Datang',
                   icon: Icons.next_plan_outlined,
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Fitur ini akan segera hadir!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 Divider(),

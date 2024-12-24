@@ -54,7 +54,14 @@ class _SettingPageState extends State<SettingPage> {
           title: 'Akan Datang'.text.make(),
           subtitle: 'Akan Datang'.text.sm.gray500.make(),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () {},
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Fitur ini akan segera hadir'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          },
         ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
       ]).scrollVertical().p16(),
     );
