@@ -26,7 +26,7 @@ class _RoutersPageState extends State<RoutersPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profil',
+            label: 'Menu',
           ),
         ],
         currentIndex: _selectIndex,

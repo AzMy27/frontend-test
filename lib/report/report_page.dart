@@ -105,7 +105,8 @@ class _ReportPageState extends State<ReportPage> {
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengirim laporan: ${context.read<ReportProvider>().errorMessage}')),
+          // SnackBar(content: Text('Gagal mengirim laporan: ${context.read<ReportProvider>().errorMessage}')),
+          SnackBar(content: Text('Gagal mengirim laporan, silakan aktifkan internet')),
         );
       }
     }

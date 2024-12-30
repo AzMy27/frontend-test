@@ -1,5 +1,6 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.0.9:8000';
+  // static const String baseUrl = 'http://192.168.0.9:8000';
+  static const String baseUrl = 'https://daibermasa.my.id';
   static const String loginSubmit = '$baseUrl/api/loginAPI';
   static const String logoutSubmit = '$baseUrl/api/logoutAPI';
   static const String addReport = '$baseUrl/api/reportPost';

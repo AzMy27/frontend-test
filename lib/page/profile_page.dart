@@ -6,6 +6,7 @@ import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/crud/dai_provider.dart';
 import 'package:android_fe/profil/edit_biodata.dart';
 import 'package:android_fe/profil/settings.dart';
+import 'package:android_fe/profil/show_biodata.dart';
 import 'package:android_fe/widget/image_token.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -103,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error during logout: ${e.toString()}'),
+          content: Text('Tidak ada koneksi internet'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 3),
         ),
@@ -134,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Profil',
+          'Menu',
           style: TextStyle(
             fontSize: 20,
           ),
@@ -214,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BiodataPage(),
+                          builder: (context) => ShowBiodata(),
                         ),
                       );
                       _loadUserProfile();
@@ -237,7 +238,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const Divider(),
                 const SizedBox(height: 10),
                 ProfileMenuWidget(
-                  title: 'Settings',
+                  title: 'Pengaturan',
                   icon: Icons.settings,
                   onPressed: () {
                     Navigator.push(

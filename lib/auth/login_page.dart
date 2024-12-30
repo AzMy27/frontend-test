@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
       _showErrorDialog(
         e.toString().contains('timeout')
             ? 'Connection timeout. Please check your internet connection.'
-            : 'Network error occurred. Please try again.',
+            : 'Tidak ada koneksi internet',
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);

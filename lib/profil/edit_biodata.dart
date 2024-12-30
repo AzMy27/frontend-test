@@ -15,7 +15,6 @@ class BiodataPage extends StatefulWidget {
 
 class _BiodataPageState extends State<BiodataPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nikController = TextEditingController();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
   final TextEditingController _tempatLahirController = TextEditingController();
@@ -37,7 +36,6 @@ class _BiodataPageState extends State<BiodataPage> {
   }
 
   void _updateControllers(dai) {
-    _nikController.text = dai.nik;
     _namaController.text = dai.nama;
     _noHpController.text = dai.noHp;
     _alamatController.text = dai.alamat;
@@ -47,7 +45,9 @@ class _BiodataPageState extends State<BiodataPage> {
     _statusKawinController.text = dai.statusKawin;
   }
 
+  bool _isUploadingImage = false;
   Future<void> _pickImage() async {
+    setState(() => _isUploadingImage = true);
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -64,6 +64,8 @@ class _BiodataPageState extends State<BiodataPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error picking image: $e')),
       );
+    } finally {
+      setState(() => _isUploadingImage = false);
     }
   }
 
@@ -195,13 +197,6 @@ class _BiodataPageState extends State<BiodataPage> {
                     ),
                     const SizedBox(height: 20),
                     _buildTextField(
-                      controller: _nikController,
-                      icon: Icons.credit_card,
-                      hint: 'NIK',
-                      validator: (value) => value == null || value.isEmpty ? "NIK tidak boleh kosong" : null,
-                      readOnly: true,
-                    ),
-                    _buildTextField(
                       controller: _namaController,
                       icon: Icons.person,
                       hint: 'Nama',
@@ -212,7 +207,11 @@ class _BiodataPageState extends State<BiodataPage> {
                       icon: Icons.phone,
                       hint: 'No Hp',
                       keyboardType: TextInputType.phone,
-                      validator: (value) => value == null || value.isEmpty ? "No HP tidak boleh kosong" : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return "No HP tidak boleh kosong";
+                        if (!RegExp(r'^\d{10,13}$').hasMatch(value)) return "Format No HP tidak valid";
+                        return null;
+                      },
                     ),
                     _buildTextField(
                       controller: _tempatLahirController,
@@ -332,7 +331,6 @@ class _BiodataPageState extends State<BiodataPage> {
 
   @override
   void dispose() {
-    _nikController.dispose();
     _namaController.dispose();
     _noHpController.dispose();
     _tempatLahirController.dispose();

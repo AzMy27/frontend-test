@@ -21,12 +21,12 @@ class DetailReportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: 'Detail Laporan'.text.make(),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => _shareReport(context),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.share),
+        //     onPressed: () => _shareReport(context),
+        //   ),
+        // ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => _refreshReport(context),
@@ -257,6 +257,9 @@ class DetailReportPage extends StatelessWidget {
   }
 
   Color _getStatusColor() {
+    if (report.validasiDesa == ReportValidationStatus.rejected) {
+      return Colors.red;
+    }
     final status = report.validasiKecamatan.toLowerCase();
     switch (status) {
       case 'diterima':
@@ -269,6 +272,9 @@ class DetailReportPage extends StatelessWidget {
   }
 
   String _getStatusText() {
+    if (report.validasiDesa == ReportValidationStatus.rejected) {
+      return 'Ditolak oleh desa';
+    }
     final status = report.validasiKecamatan.toLowerCase();
     switch (status) {
       case 'diterima':

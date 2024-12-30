@@ -69,8 +69,7 @@ class DaiProvider extends ChangeNotifier {
         throw Exception(errorData['message'] ?? 'Failed to load Dai profile');
       }
     } catch (e) {
-      _errorMessage = e.toString();
-      _daiProfile = null;
+      _errorMessage = e is SocketException ? 'Network connection error' : e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
