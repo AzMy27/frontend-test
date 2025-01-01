@@ -1,5 +1,5 @@
-import 'package:android_fe/page/Profile_page.dart';
 import 'package:android_fe/page/main_home.dart';
+import 'package:android_fe/page/menu_page.dart';
 import 'package:flutter/material.dart';
 
 class RoutersPage extends StatefulWidget {
@@ -12,7 +12,7 @@ class RoutersPage extends StatefulWidget {
 class _RoutersPageState extends State<RoutersPage> {
   final _routers = [
     const MainHome(),
-    const ProfilePage(),
+    const MenuPage(),
   ];
   int _selectIndex = 0;
   @override

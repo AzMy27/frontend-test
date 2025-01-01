@@ -4,23 +4,21 @@ import 'package:android_fe/auth/login_page.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/profil/about.dart';
 import 'package:android_fe/profil/crud/dai_provider.dart';
-import 'package:android_fe/profil/edit_biodata.dart';
 import 'package:android_fe/profil/settings.dart';
 import 'package:android_fe/profil/show_biodata.dart';
-import 'package:android_fe/widget/image_token.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class MenuPage extends StatefulWidget {
+  const MenuPage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<MenuPage> createState() => _MenuPageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _MenuPageState extends State<MenuPage> {
   String _username = 'Pengguna';
   String _email = '';
   String _profilImage = 'images/polbeng.png';
@@ -221,7 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _loadUserProfile();
                     },
                     child: const Text(
-                      'Edit',
+                      'Biodata',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,

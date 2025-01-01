@@ -235,7 +235,7 @@ class _BiodataPageState extends State<BiodataPage> {
                     ),
                     _buildTextField(
                       controller: _statusKawinController,
-                      icon: Icons.person,
+                      icon: Icons.favorite,
                       hint: 'Status Kawin',
                       validator: (value) => value == null || value.isEmpty ? "Status Kawin tidak boleh kosong" : null,
                     ),
