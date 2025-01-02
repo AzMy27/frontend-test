@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class BiodataPage extends StatefulWidget {
-  const BiodataPage({Key? key}) : super(key: key);
+class EditBiodataPage extends StatefulWidget {
+  const EditBiodataPage({Key? key}) : super(key: key);
 
   @override
-  _BiodataPageState createState() => _BiodataPageState();
+  _EditBiodataPageState createState() => _EditBiodataPageState();
 }
 
-class _BiodataPageState extends State<BiodataPage> {
+class _EditBiodataPageState extends State<EditBiodataPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
@@ -35,7 +36,7 @@ class _BiodataPageState extends State<BiodataPage> {
     });
   }
 
-  void _updateControllers(dai) {
+  Future<void> _updateControllers(dai) async {
     _namaController.text = dai.nama;
     _noHpController.text = dai.noHp;
     _alamatController.text = dai.alamat;
@@ -43,6 +44,9 @@ class _BiodataPageState extends State<BiodataPage> {
     _tanggalLahirController.text = dai.tanggalLahir;
     _pendidikanAkhirController.text = dai.pendidikanAkhir;
     _statusKawinController.text = dai.statusKawin;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', dai.nama);
   }
 
   bool _isUploadingImage = false;
@@ -88,6 +92,8 @@ class _BiodataPageState extends State<BiodataPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Profil berhasil diperbarui')),
         );
+        Navigator.pop(context);
+        await Provider.of<DaiProvider>(context, listen: false).fetchDaiProfile();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal memperbarui profil')),

@@ -107,9 +107,9 @@ class DetailReportPage extends StatelessWidget {
             _buildTableRow('Tujuan', report.purpose),
             _buildTableRow('Deskripsi', report.description),
             _buildTableRow('Validasi Desa', report.validasiDesa),
-            if (report.validasiDesa != 'diterima') _buildTableRow('Koreksi Desa', report.koreksiDesa),
+            _buildTableRow('Koreksi Desa', report.koreksiDesa),
             _buildTableRow('Validasi Kecamatan', report.validasiKecamatan),
-            if (report.validasiKecamatan != 'diterima') _buildTableRow('Koreksi Kecamatan', report.koreksiKecamatan),
+            _buildTableRow('Koreksi Kecamatan', report.koreksiKecamatan),
           ],
         ),
       ),
@@ -152,6 +152,9 @@ class DetailReportPage extends StatelessWidget {
       _buildDataRow('Tujuan', report.purpose),
       _buildDataRow('Deskripsi', report.description),
       _buildDataRow('Validasi Desa', _getValidationStatusText(report.validasiDesa)),
+      _buildDataRow('Koreksi Desa', report.koreksiDesa),
+      _buildDataRow('Validasi Kecamatan', _getValidationStatusText(report.validasiKecamatan)),
+      _buildDataRow('Koreksi Kecamatan', report.koreksiKecamatan),
     ];
 
     if (report.validasiDesa != ReportValidationStatus.accepted) {

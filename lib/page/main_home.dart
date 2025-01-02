@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:android_fe/model/report_model.dart';
+import 'package:android_fe/profil/crud/dai_provider.dart';
 import 'package:android_fe/report/crud/get_report.dart';
 import 'package:flutter/material.dart';
 import 'package:android_fe/config/constants/colors.dart' as color;
 import 'package:android_fe/report/history_page.dart';
 import 'package:android_fe/report/report_page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainHome extends StatefulWidget {
@@ -61,8 +63,10 @@ class _MainHomeState extends State<MainHome> {
 
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
+    final daiProvider = Provider.of<DaiProvider>(context, listen: false);
+
     setState(() {
-      _username = prefs.getString('username') ?? 'Pengguna';
+      _username = daiProvider.daiProfile?.nama ?? prefs.getString('username') ?? 'Pengguna';
     });
   }
 

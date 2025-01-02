@@ -47,7 +47,7 @@ class _MenuPageState extends State<MenuPage> {
     final daiProvider = Provider.of<DaiProvider>(context, listen: false);
 
     setState(() {
-      _username = prefs.getString('username') ?? 'Pengguna';
+      _username = daiProvider.daiProfile?.nama ?? prefs.getString('username') ?? 'Pengguna';
       _email = prefs.getString('email') ?? 'Email tidak ditemukan';
       String? fotoDai = daiProvider.daiProfile?.fotoDai ?? prefs.getString('foto_dai');
       if (fotoDai != null && fotoDai.isNotEmpty) {

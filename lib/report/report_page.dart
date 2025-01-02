@@ -28,6 +28,14 @@ class _ReportPageState extends State<ReportPage> {
   final TextEditingController _purposeController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReportProvider>().refreshToken();
+    });
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _typeController.dispose();

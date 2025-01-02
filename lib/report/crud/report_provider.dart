@@ -24,6 +24,12 @@ class ReportProvider extends ChangeNotifier {
     _myToken();
   }
 
+  Future<void> refreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token');
+    notifyListeners();
+  }
+
   Future<void> getAllReport() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -93,13 +99,28 @@ class ReportProvider extends ChangeNotifier {
     required String target,
     required String purpose,
   }) async {
-    if (_token == null) {
-      setValidationError(true, 'Authentication token not found');
+    // 1. Cek koneksi internet terlebih dahulu
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isEmpty || result[0].rawAddress.isEmpty) {
+        setValidationError(true, 'Tidak ada koneksi internet');
+        return false;
+      }
+    } catch (_) {
+      setValidationError(true, 'Tidak ada koneksi internet');
       return false;
     }
 
+    // 2. Refresh token
+    await refreshToken();
+    if (_token == null) {
+      setValidationError(true, 'Silakan login kembali');
+      return false;
+    }
+
+    // 3. Validasi images
     if (images.isEmpty) {
-      setValidationError(true, 'Please add at least one image');
+      setValidationError(true, 'Mohon tambahkan minimal satu gambar');
       return false;
     }
 
@@ -138,23 +159,26 @@ class ReportProvider extends ChangeNotifier {
           );
           request.files.add(file);
         } catch (e) {
-          throw Exception('Failed to process image ${i + 1}: ${e.toString()}');
+          throw Exception('Gagal memproses gambar ${i + 1}: ${e.toString()}');
         }
       }
 
       final streamedResponse = await request.send().timeout(
             const Duration(seconds: 30),
-            onTimeout: () => throw Exception('Request timed out'),
+            onTimeout: () => throw Exception('Waktu request habis'),
           );
 
       final response = await http.Response.fromStream(streamedResponse);
       final responseData = json.decode(response.body);
 
+      // 4. Penanganan response yang lebih detail
       if (response.statusCode == 201) {
         clearImages();
         return true;
+      } else if (response.statusCode == 401) {
+        throw Exception('Sesi telah berakhir, silakan login kembali');
       } else {
-        throw Exception(responseData['message'] ?? 'Unknown error occurred');
+        throw Exception(responseData['message'] ?? 'Terjadi kesalahan pada server');
       }
     } catch (e) {
       setValidationError(true, e.toString());

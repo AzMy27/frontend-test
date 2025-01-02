@@ -1,8 +1,8 @@
-import 'package:android_fe/profil/edit_biodata.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:android_fe/profil/crud/dai_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:android_fe/profil/edit_biodata.dart';
 
 class ShowBiodata extends StatefulWidget {
   const ShowBiodata({super.key});
@@ -12,12 +12,38 @@ class ShowBiodata extends StatefulWidget {
 }
 
 class _ShowBiodataState extends State<ShowBiodata> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<DaiProvider>(context, listen: false).fetchDaiProfile();
-    });
+  void _showImageViewer(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
+            backgroundColor: Colors.black,
+          ),
+          body: InteractiveViewer(
+            child: Container(
+              color: Colors.black,
+              child: Center(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'images/polbeng.png',
+                      fit: BoxFit.contain,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -32,7 +58,7 @@ class _ShowBiodataState extends State<ShowBiodata> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BiodataPage(),
+                  builder: (context) => EditBiodataPage(),
                 ),
               );
             },
@@ -67,33 +93,40 @@ class _ShowBiodataState extends State<ShowBiodata> {
           }
 
           return VStack([
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 2,
+            GestureDetector(
+              onTap: () {
+                if (dai.fotoDai != null) {
+                  _showImageViewer(context, dai.fotoDai!);
+                }
+              },
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(60),
-                child: dai.fotoDai != null
-                    ? Image.network(
-                        dai.fotoDai!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'images/polbeng.png',
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      )
-                    : Image.asset(
-                        'images/polbeng.png',
-                        fit: BoxFit.cover,
-                      ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(60),
+                  child: dai.fotoDai != null
+                      ? Image.network(
+                          dai.fotoDai!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'images/polbeng.png',
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          'images/polbeng.png',
+                          fit: BoxFit.cover,
+                        ),
+                ),
               ),
             ).centered(),
             20.heightBox,
