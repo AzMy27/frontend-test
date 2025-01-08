@@ -55,7 +55,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: 'Kirim Reset Password'.text.make(),
+            child: 'Reset Password'.text.make(),
           ),
         ],
         crossAlignment: CrossAxisAlignment.stretch,

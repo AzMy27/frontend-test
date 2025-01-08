@@ -27,7 +27,7 @@ class _AboutPageState extends State<AboutPage> {
         30.heightBox,
         "Tentang Aplikasi".text.bold.size(20).make().centered(),
         10.heightBox,
-        "Aplikasi pelaporan DAI adalah platform untuk mengelola dan memantau aktivitas para Da'i dalam melakukan dakwah di masyarakat. Aplikasi ini membantu mengorganisir kegiatan dakwah dengan lebih efektif dan terstruktur."
+        "Aplikasi ini adalah aplikasi untuk mengelola dan memantau aktivitas para Da'i dalam melakukan dakwah di masyarakat. Aplikasi ini membantu mengorganisir kegiatan dakwah dengan lebih efektif dan terstruktur."
             .text
             .center
             .size(16)
@@ -48,7 +48,7 @@ class _AboutPageState extends State<AboutPage> {
           "Dosen Politeknik Negeri Bengkalis".text.gray500.size(14).make().centered(),
         ]).p16().box.roundedLg.color(Colors.blue.withOpacity(0.1)).make().w(context.screenWidth * 0.85).centered(),
         30.heightBox,
-        "© 2024 Politeknik Negeri Bengkalis\nSemua hak cipta dilindungi".text.gray500.size(14).center.make().centered(),
+        "© 2024 Muhammad Azmi\n Semua hak cipta dilindungi".text.gray500.size(14).center.make().centered(),
         20.heightBox,
       ]).scrollVertical().p20(),
     );

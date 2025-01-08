@@ -1,4 +1,5 @@
 import 'package:android_fe/auth/app_logo.dart';
+import 'package:android_fe/auth/forgot_password.dart';
 import 'package:android_fe/config/routing/ApiRoutes.dart';
 import 'package:android_fe/main.dart';
 import 'package:android_fe/page/routers_page.dart';
@@ -42,10 +43,10 @@ class _LoginPageState extends State<LoginPage> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'Password harus diisi';
     }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    if (value.length < 8) {
+      return 'Password harus diisi dengan 8 huruf';
     }
     return null;
   }
@@ -149,9 +150,18 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     CommonLogo().pOnly(bottom: 15),
-                    "Login Pengguna".text.size(22).black.make().pOnly(bottom: 10),
+                    "Login Dai".text.size(22).black.bold.make().pOnly(bottom: 10),
                     _buildEmailField(),
                     _buildPasswordField(),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => const ForgetPasswordPage()),
+                    //     );
+                    //   },
+                    //   child: 'Lupa Password?'.text.size(14).blue500.bold.make().pOnly(top: 5, left: 270),
+                    // ),
                     _buildLoginButton(),
                   ],
                 ),
@@ -271,7 +281,6 @@ class AuthInterceptor {
     await prefs.remove('username');
     await prefs.remove('email');
 
-    // Navigasi ke halaman login
     navigatorKey.currentState?.pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const LoginPage()),
       (route) => false,

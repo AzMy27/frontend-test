@@ -1,5 +1,5 @@
 import 'package:android_fe/password/change_password.dart';
-import 'package:android_fe/password/forgot_password.dart';
+import 'package:android_fe/password/forgot_password_login.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 
