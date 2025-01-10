@@ -51,25 +51,30 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkTokenValidity() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final expiredAt = prefs.getString('token_expired');
-
-    if (token == null || expiredAt == null) {
-      setState(() {
-        _isTokenValid = false;
-        _isLoading = false;
-      });
-      return;
-    }
-
     try {
-      final expirationDate = DateTime.parse(expiredAt);
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final expiredAtString = prefs.getString('token_expired');
+
+      if (token == null || expiredAtString == null) {
+        setState(() {
+          _isTokenValid = false;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Convert timestamp to DateTime
+      final expiredAt = DateTime.fromMillisecondsSinceEpoch(
+          int.parse(expiredAtString) * 1000 // Convert Unix timestamp to milliseconds
+          );
+
       setState(() {
-        _isTokenValid = expirationDate.isAfter(DateTime.now());
+        _isTokenValid = expiredAt.isAfter(DateTime.now());
         _isLoading = false;
       });
     } catch (e) {
+      print('Token validation error: $e');
       setState(() {
         _isTokenValid = false;
         _isLoading = false;

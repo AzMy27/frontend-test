@@ -110,13 +110,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _saveUserData(Map<String, dynamic> data) async {
-    final prefs = await SharedPreferences.getInstance();
-    await Future.wait([
-      prefs.setString('token', data['token'].toString()),
-      prefs.setString('username', data['user']['name'].toString()),
-      prefs.setString('email', data['user']['email'].toString()),
-      prefs.setString('token_expired', data['expires_at'].toString()),
-    ]);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await Future.wait([
+        prefs.setString('token', data['token'].toString()),
+        prefs.setString('username', data['user']['name'].toString()),
+        prefs.setString('email', data['user']['email'].toString()),
+        prefs.setString('token_expired', data['expired_at'].toString()),
+      ]);
+
+      final savedToken = prefs.getString('token');
+      final savedExpiry = prefs.getString('token_expired');
+
+      if (savedToken == null || savedExpiry == null) {
+        throw Exception('Failed to save authentication data');
+      }
+    } catch (e) {
+      print('Error saving user data: $e');
+      throw Exception('Failed to save authentication data');
+    }
   }
 
   void _navigateToHome() {

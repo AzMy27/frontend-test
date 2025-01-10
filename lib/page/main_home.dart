@@ -109,7 +109,7 @@ class _MainHomeState extends State<MainHome> {
                 Row(
                   children: [
                     Text(
-                      'Beranda',
+                      'Dai Bermasa',
                       style: TextStyle(
                         fontSize: 30,
                         color: color.AppColor.homePageTitle,
