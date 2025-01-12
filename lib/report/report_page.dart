@@ -212,7 +212,7 @@ class _ReportPageState extends State<ReportPage> {
                   _buildTextField(
                     controller: _typeController,
                     icon: Icons.type_specimen,
-                    hint: 'Tipe Kegiatan',
+                    hint: 'Tipe Kegiatan (Harian, Mingguan atau Bulanan)',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Tipe tidak boleh kosong';
@@ -223,7 +223,7 @@ class _ReportPageState extends State<ReportPage> {
                   _buildTextField(
                     controller: _placeController,
                     icon: Icons.location_on,
-                    hint: 'Lokasi',
+                    hint: 'Lokasi (contoh: Masjid Istiqomah)',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Lokasi tidak boleh kosong';
@@ -416,7 +416,7 @@ class _ReportPageState extends State<ReportPage> {
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(2024),
-            lastDate: DateTime(2100),
+            lastDate: DateTime.now(),
           );
           if (pickedDate != null) {
             String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);

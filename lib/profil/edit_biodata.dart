@@ -18,9 +18,11 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
+  final TextEditingController _alamatController = TextEditingController();
+  final TextEditingController _rtController = TextEditingController();
+  final TextEditingController _rwController = TextEditingController();
   final TextEditingController _tempatLahirController = TextEditingController();
   final TextEditingController _tanggalLahirController = TextEditingController();
-  final TextEditingController _alamatController = TextEditingController();
   final TextEditingController _pendidikanAkhirController = TextEditingController();
   final TextEditingController _statusKawinController = TextEditingController();
 
@@ -40,6 +42,8 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
     _namaController.text = dai.nama;
     _noHpController.text = dai.noHp;
     _alamatController.text = dai.alamat;
+    _rtController.text = dai.rt;
+    _rwController.text = dai.rw;
     _tempatLahirController.text = dai.tempatLahir;
     _tanggalLahirController.text = dai.tanggalLahir;
     _pendidikanAkhirController.text = dai.pendidikanAkhir;
@@ -81,6 +85,8 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
         nama: _namaController.text,
         noHp: _noHpController.text,
         alamat: _alamatController.text,
+        rt: _rtController.text,
+        rw: _rwController.text,
         tempatLahir: _tempatLahirController.text,
         tanggalLahir: _tanggalLahirController.text,
         pendidikanAkhir: _pendidikanAkhirController.text,
@@ -124,7 +130,7 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
                     onPressed: () {
                       Navigator.of(context).pushReplacementNamed('/login');
                     },
-                    child: Text('Go to Login'),
+                    child: Text('Kembali ke Login'),
                   )
                 ],
               ),
@@ -142,6 +148,7 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
           return SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFFFFFFFF), Color(0xFFD3D3D3)],
@@ -173,10 +180,10 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
                                         dai!.fotoDai!,
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, StackTrace) {
-                                          return Image.asset('images/polbeng.png', fit: BoxFit.cover);
+                                          return Image.asset('images/bengkalis.png', fit: BoxFit.cover);
                                         },
                                       )
-                                    : Image.asset('images/polbeng.png')),
+                                    : Image.asset('images/bengkalis.png')),
                           ),
                         ),
                         Positioned(
@@ -233,17 +240,16 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
                       validator: (value) => value == null || value.isEmpty ? "Alamat tidak boleh kosong" : null,
                     ),
                     _buildTextField(
-                      controller: _pendidikanAkhirController,
+                      controller: _rtController,
                       icon: Icons.school,
-                      hint: 'Pendidikan Akhir',
-                      validator: (value) =>
-                          value == null || value.isEmpty ? "Pendidikan Akhir tidak boleh kosong" : null,
+                      hint: 'RT',
+                      validator: (value) => value == null || value.isEmpty ? "RT tidak boleh kosong" : null,
                     ),
                     _buildTextField(
-                      controller: _statusKawinController,
+                      controller: _rwController,
                       icon: Icons.favorite,
-                      hint: 'Status Kawin',
-                      validator: (value) => value == null || value.isEmpty ? "Status Kawin tidak boleh kosong" : null,
+                      hint: 'RW',
+                      validator: (value) => value == null || value.isEmpty ? "RW tidak boleh kosong" : null,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(

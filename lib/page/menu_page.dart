@@ -21,7 +21,7 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   String _username = 'Pengguna';
   String _email = '';
-  String _profilImage = 'images/polbeng.png';
+  String _profilImage = 'images/bengkalis.png';
 
   @override
   void initState() {
@@ -53,7 +53,7 @@ class _MenuPageState extends State<MenuPage> {
       if (fotoDai != null && fotoDai.isNotEmpty) {
         _profilImage = fotoDai;
       } else {
-        _profilImage = 'images/polbeng.png';
+        _profilImage = 'images/bengkalis.png';
       }
     });
   }
@@ -167,7 +167,7 @@ class _MenuPageState extends State<MenuPage> {
                         final dai = daiProvider.daiProfile;
                         if (dai == null || dai.fotoDai == null || dai.fotoDai!.isEmpty) {
                           return Image.asset(
-                            'images/polbeng.png',
+                            'images/bengkalis.png',
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
@@ -180,7 +180,7 @@ class _MenuPageState extends State<MenuPage> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
-                              'images/polbeng.png',
+                              'images/bengkalis.png',
                               width: 120,
                               height: 120,
                               fit: BoxFit.cover,

@@ -33,7 +33,7 @@ class _ShowBiodataState extends State<ShowBiodata> {
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
-                      'images/polbeng.png',
+                      'images/bengkalis.png',
                       fit: BoxFit.contain,
                     );
                   },
@@ -117,23 +117,29 @@ class _ShowBiodataState extends State<ShowBiodata> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
-                              'images/polbeng.png',
+                              'images/bengkalis.png',
                               fit: BoxFit.cover,
                             );
                           },
                         )
                       : Image.asset(
-                          'images/polbeng.png',
+                          'images/bengkalis.png',
                           fit: BoxFit.cover,
                         ),
                 ),
               ),
             ).centered(),
             20.heightBox,
-            _buildInfoCard(title: 'NIK', value: dai.nik, icon: Icons.badge),
+            _buildInfoCard(
+              title: 'NIK',
+              value: dai.nik.length > 4 ? '${dai.nik.substring(0, 4)}${'x' * (dai.nik.length - 4)}' : dai.nik,
+              icon: Icons.badge,
+            ),
             _buildInfoCard(title: 'Nama', value: dai.nama, icon: Icons.person),
             _buildInfoCard(title: 'No HP', value: dai.noHp, icon: Icons.phone),
             _buildInfoCard(title: 'Alamat', value: dai.alamat, icon: Icons.location_on),
+            _buildInfoCard(title: 'RT', value: dai.rt, icon: Icons.location_on),
+            _buildInfoCard(title: 'RW', value: dai.rw, icon: Icons.location_on),
             _buildInfoCard(title: 'Tempat Lahir', value: dai.tempatLahir, icon: Icons.location_city),
             _buildInfoCard(title: 'Tanggal Lahir', value: dai.tanggalLahir, icon: Icons.calendar_today),
             _buildInfoCard(title: 'Pendidikan Akhir', value: dai.pendidikanAkhir, icon: Icons.school),

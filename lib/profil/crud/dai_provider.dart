@@ -69,7 +69,7 @@ class DaiProvider extends ChangeNotifier {
         throw Exception(errorData['message'] ?? 'Failed to load Dai profile');
       }
     } catch (e) {
-      _errorMessage = e is SocketException ? 'Network connection error' : e.toString();
+      _errorMessage = e is SocketException ? 'Tidak ada koneksi jaringan' : e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -80,6 +80,8 @@ class DaiProvider extends ChangeNotifier {
     required String nama,
     required String noHp,
     required String alamat,
+    required String rt,
+    required String rw,
     required String tempatLahir,
     required String tanggalLahir,
     required String pendidikanAkhir,
@@ -109,6 +111,8 @@ class DaiProvider extends ChangeNotifier {
         'nama': nama,
         'no_hp': noHp,
         'alamat': alamat,
+        'rt': rt,
+        'rw': rw,
         'tempat_lahir': tempatLahir,
         'tanggal_lahir': tanggalLahir,
         'pendidikan_akhir': pendidikanAkhir,

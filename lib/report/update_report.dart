@@ -359,7 +359,7 @@ class _UpdateReportState extends State<UpdateReport> {
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(2024),
-            lastDate: DateTime(2100),
+            lastDate: DateTime.now(),
           );
           if (pickedDate != null) {
             String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);

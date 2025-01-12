@@ -3,6 +3,8 @@ class Dai {
   final String nama;
   final String noHp;
   final String alamat;
+  final String rt;
+  final String rw;
   final String tempatLahir;
   final String tanggalLahir;
   final String pendidikanAkhir;
@@ -14,6 +16,8 @@ class Dai {
     required this.nama,
     required this.noHp,
     required this.alamat,
+    required this.rt,
+    required this.rw,
     required this.tempatLahir,
     required this.tanggalLahir,
     required this.pendidikanAkhir,
@@ -26,6 +30,8 @@ class Dai {
       nama: json['nama'] ?? '',
       noHp: json['no_hp'] ?? '',
       alamat: json['alamat'] ?? '',
+      rt: json['rt'] ?? '',
+      rw: json['rw'] ?? '',
       tempatLahir: json['tempat_lahir'] ?? '',
       tanggalLahir: json['tanggal_lahir'] ?? '',
       pendidikanAkhir: json['pendidikan_akhir'] ?? '',
@@ -39,6 +45,8 @@ class Dai {
         'nama': nama,
         'no_hp': noHp,
         'alamat': alamat,
+        'rt': rt,
+        'rw': rw,
         'tanggal_lahir': tanggalLahir,
         'tempat_lahir': tempatLahir,
         'pendidikan_akhir': pendidikanAkhir,

@@ -17,12 +17,12 @@ class _AboutPageState extends State<AboutPage> {
       ),
       body: VStack([
         Image.asset(
-          'images/polbeng.png',
+          'images/bengkalis-bermasa.png',
           width: 120,
           height: 120,
         ).box.roundedFull.border(color: Colors.blue, width: 2).clip(Clip.antiAlias).make().centered(),
         20.heightBox,
-        "Aplikasi pelaporan DAI".text.blue500.size(24).bold.make().centered(),
+        "Dai Bermasa".text.blue500.size(24).bold.make().centered(),
         "Versi 1.0.0".text.gray500.size(16).make().centered(),
         30.heightBox,
         "Tentang Aplikasi".text.bold.size(20).make().centered(),
@@ -48,7 +48,7 @@ class _AboutPageState extends State<AboutPage> {
           "Dosen Politeknik Negeri Bengkalis".text.gray500.size(14).make().centered(),
         ]).p16().box.roundedLg.color(Colors.blue.withOpacity(0.1)).make().w(context.screenWidth * 0.85).centered(),
         30.heightBox,
-        "© 2024 Muhammad Azmi\n Semua hak cipta dilindungi".text.gray500.size(14).center.make().centered(),
+        // "© 2024 Muhammad Azmi\n Semua hak cipta dilindungi".text.gray500.size(14).center.make().centered(),
         20.heightBox,
       ]).scrollVertical().p20(),
     );

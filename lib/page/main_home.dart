@@ -108,6 +108,12 @@ class _MainHomeState extends State<MainHome> {
               children: [
                 Row(
                   children: [
+                    Image.asset(
+                      'images/bengkalis-bermasa.png',
+                      width: 50,
+                      height: 50,
+                    ),
+                    SizedBox(width: 15),
                     Text(
                       'Dai Bermasa',
                       style: TextStyle(
@@ -188,80 +194,80 @@ class _MainHomeState extends State<MainHome> {
                   ),
                 ),
                 SizedBox(height: 15),
-                Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 30),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 40,
-                            offset: Offset(8, 10),
-                            color: color.AppColor.gradientSecond.withOpacity(0.3),
-                          ),
-                          BoxShadow(
-                            blurRadius: 10,
-                            offset: Offset(-1, -5),
-                            color: color.AppColor.gradientSecond.withOpacity(0.3),
-                          ),
-                        ],
-                      ),
-                      height: 120,
-                    ),
-                    Positioned(
-                      left: 10,
-                      top: 0,
-                      child: Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          image: const DecorationImage(
-                            image: AssetImage('images/book.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 170,
-                      top: 30,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Laporan Hari Ini',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: color.AppColor.homePageTitle,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          RichText(
-                            text: TextSpan(
-                              text: 'Status: ',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: color.AppColor.homePagePlanColor,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: _getStatusText(),
-                                  style: TextStyle(
-                                    color: _getStatusColor(),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                // Stack(
+                //   children: [
+                //     Container(
+                //       margin: const EdgeInsets.only(top: 30),
+                //       decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(15),
+                //         boxShadow: [
+                //           BoxShadow(
+                //             blurRadius: 40,
+                //             offset: Offset(8, 10),
+                //             color: color.AppColor.gradientSecond.withOpacity(0.3),
+                //           ),
+                //           BoxShadow(
+                //             blurRadius: 10,
+                //             offset: Offset(-1, -5),
+                //             color: color.AppColor.gradientSecond.withOpacity(0.3),
+                //           ),
+                //         ],
+                //       ),
+                //       height: 120,
+                //     ),
+                //     Positioned(
+                //       left: 10,
+                //       top: 0,
+                //       child: Container(
+                //         height: 150,
+                //         width: 150,
+                //         decoration: BoxDecoration(
+                //           borderRadius: BorderRadius.circular(15),
+                //           image: const DecorationImage(
+                //             image: AssetImage('images/book.png'),
+                //             fit: BoxFit.cover,
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //     Positioned(
+                //       left: 170,
+                //       top: 30,
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           Text(
+                //             'Laporan Hari Ini',
+                //             style: TextStyle(
+                //               fontSize: 18,
+                //               fontWeight: FontWeight.bold,
+                //               color: color.AppColor.homePageTitle,
+                //             ),
+                //           ),
+                //           SizedBox(height: 10),
+                //           RichText(
+                //             text: TextSpan(
+                //               text: 'Status: ',
+                //               style: TextStyle(
+                //                 fontSize: 16,
+                //                 color: color.AppColor.homePagePlanColor,
+                //               ),
+                //               children: [
+                //                 TextSpan(
+                //                   text: _getStatusText(),
+                //                   style: TextStyle(
+                //                     color: _getStatusColor(),
+                //                     fontWeight: FontWeight.bold,
+                //                   ),
+                //                 ),
+                //               ],
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(height: 20),
                 Text(
                   'Laporkan Kegiatan',
