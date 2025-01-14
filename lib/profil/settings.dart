@@ -33,20 +33,20 @@ class _SettingPageState extends State<SettingPage> {
             );
           },
         ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
-        ListTile(
-          leading: const Icon(Icons.help_outline_sharp),
-          title: 'Lupa Password'.text.make(),
-          subtitle: 'Atur ulang password anda'.text.sm.gray500.make(),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ForgotPassword(),
-              ),
-            );
-          },
-        ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
+        // ListTile(
+        //   leading: const Icon(Icons.help_outline_sharp),
+        //   title: 'Lupa Password'.text.make(),
+        //   subtitle: 'Atur ulang password anda'.text.sm.gray500.make(),
+        //   trailing: const Icon(Icons.arrow_forward_ios),
+        //   onTap: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(
+        //         builder: (context) => const ForgotPassword(),
+        //       ),
+        //     );
+        //   },
+        // ).box.border(color: Colors.grey.shade300).roundedSM.make().p8(),
         const Divider().py12(),
         'Lainnya'.text.bold.xl.make().p16().box.margin(const EdgeInsets.only(bottom: 8)).make(),
         ListTile(

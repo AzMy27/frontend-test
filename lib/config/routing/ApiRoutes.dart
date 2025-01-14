@@ -11,6 +11,8 @@ class ApiConstants {
   static const String updateDai = '$baseUrl/api/daiUpdate';
   static const String saveTokenFCM = '$baseUrl/api/saveToken';
   static const String changePassword = '$baseUrl/api/changePassword';
+  static const String forgotPassword = '$baseUrl/api/forgotPassword';
+  static const String resetPassword = '$baseUrl/api/resetPassword';
 }
 
 class AppConfig {

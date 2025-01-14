@@ -241,13 +241,13 @@ class _EditBiodataPageState extends State<EditBiodataPage> {
                     ),
                     _buildTextField(
                       controller: _rtController,
-                      icon: Icons.school,
+                      icon: Icons.location_on,
                       hint: 'RT',
                       validator: (value) => value == null || value.isEmpty ? "RT tidak boleh kosong" : null,
                     ),
                     _buildTextField(
                       controller: _rwController,
-                      icon: Icons.favorite,
+                      icon: Icons.location_on,
                       hint: 'RW',
                       validator: (value) => value == null || value.isEmpty ? "RW tidak boleh kosong" : null,
                     ),

@@ -27,7 +27,7 @@ class _AboutPageState extends State<AboutPage> {
         30.heightBox,
         "Tentang Aplikasi".text.bold.size(20).make().centered(),
         10.heightBox,
-        "Aplikasi ini adalah aplikasi untuk mengelola dan memantau aktivitas para Da'i dalam melakukan dakwah di masyarakat. Aplikasi ini membantu mengorganisir kegiatan dakwah dengan lebih efektif dan terstruktur."
+        "Aplikasi ini adalah aplikasi untuk mengelola dan memantau aktivitas para Dai dalam melakukan dakwah di masyarakat. Aplikasi ini membantu mengorganisir kegiatan dakwah dengan lebih efektif dan terstruktur."
             .text
             .center
             .size(16)
